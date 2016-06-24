@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LineAdapter adapter;
 
+    private ReaderTask readerTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        readerTask = new ReaderTask();
         readerTask.execute();
     }
 
@@ -46,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
 
         readerTask.cancel(false);
+        readerTask = null;
     }
 
-    private AsyncTask<Void, String, Void> readerTask = new AsyncTask<Void, String, Void>() {
+    private class ReaderTask extends AsyncTask<Void, String, Void> {
 
         private void write(PrintWriter out, String command) {
             out.printf("%04x%s", command.length(), command);
@@ -59,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
             try {
 
-                Socket socket = new Socket("10.0.2.2", 5037);
+                //Socket socket = new Socket("10.0.2.2", 5037);
+                Socket socket = new Socket("localhost", 5555);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

@@ -6,47 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> {
 
-    private List<Line> lines = new ArrayList<>();
+    private static long MIN_TIME = 100;
 
-    public LineAdapter() {
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-        lines.add(new Line("ClassLoader referenced unknown path: /data/app/com.tananaev.logcat-1/lib/x86_64"));
-        lines.add(new Line("Before Android 4.1, method android.graphics.PorterDuffColorFilter android.support.graphics.drawable.VectorDrawableCompat.updateTintFilter(android.graphics.PorterDuffColorFilter"));
-        lines.add(new Line("No adapter attached; skipping layout"));
-        lines.add(new Line("Failed sending reply to debugger: Broken pipe"));
-    }
+    private List<Line> lines = new LinkedList<>();
+
+    private long updated = System.currentTimeMillis();
+    private int size = 0;
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
 
@@ -61,6 +31,19 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             return textView;
         }
 
+    }
+
+    public boolean addItem(String line) {
+        lines.add(new Line(line));
+        if (System.currentTimeMillis() - updated > MIN_TIME) {
+            notifyItemRangeInserted(size, lines.size() - size);
+            updated = System.currentTimeMillis();
+            size = lines.size();
+            return true;
+        } else {
+            updated = System.currentTimeMillis();
+            return false;
+        }
     }
 
     @Override
@@ -78,7 +61,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     @Override
     public int getItemCount() {
-        return lines.size();
+        return size;
     }
 
 }

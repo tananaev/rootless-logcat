@@ -1,4 +1,5 @@
 <resources>
+    <dimen name="space">2dp</dimen>
     <dimen name="margin">8dp</dimen>
-    <dimen name="font_size">10sp</dimen>
+    <dimen name="font">12sp</dimen>
 </resources>

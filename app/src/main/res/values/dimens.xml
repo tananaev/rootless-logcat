@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="margin">8dp</dimen>
+    <dimen name="font_size">10sp</dimen>
+</resources>

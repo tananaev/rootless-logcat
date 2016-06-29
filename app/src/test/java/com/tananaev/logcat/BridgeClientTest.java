@@ -5,6 +5,7 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
@@ -26,8 +27,10 @@ public class BridgeClientTest {
 
         try {
 
+            // CNXN > AUTH (20) > AUTH (256) > AUTH (20) > AUTH (7xx) > CNXN
+
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(512);
+            kpg.initialize(2048);
             KeyPair kp = kpg.genKeyPair();
             Key publicKey = kp.getPublic();
             Key privateKey = kp.getPrivate();
@@ -35,9 +38,27 @@ public class BridgeClientTest {
             boolean triedAuthentication = false;
             boolean sendPublicKey = false;
 
-            BridgeClient client = new BridgeClient("10.28.254.130", 5555);
+            BridgeClient client = new BridgeClient(5556);
+
+            BridgeMessage message = client.read();
+
+            byte[] token = new byte[20];
 
             client.write(new BridgeMessage(
+                    BridgeMessage.A_AUTH, 1, 0, token));
+
+            message = client.read();
+
+            client.write(new BridgeMessage(
+                    BridgeMessage.A_AUTH, 1, 0, token));
+
+            message = client.read();
+
+            String key = new String(Hex.encodeHex(message.getData()));
+
+            System.out.print("");
+
+            /*client.write(new BridgeMessage(
                     BridgeMessage.A_CNXN, 0x01000000, 0x00040000, "host::features=cmd,shell_v2".getBytes()));
 
             BridgeMessage message = client.read();
@@ -51,12 +72,12 @@ public class BridgeClientTest {
 
                     message = client.read();
 
-                        /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         stream.write(headerOID);
                         stream.write(token);
                         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
                         cipher.init(Cipher.ENCRYPT_MODE, getPrivateKey());
-                        return cipher.doFinal(stream.toByteArray());*/
+                        return cipher.doFinal(stream.toByteArray());
 
                     triedAuthentication = true;
 
@@ -75,7 +96,7 @@ public class BridgeClientTest {
 
                 }
 
-            }
+            }*/
 
         } catch (Exception e) {
             Assert.fail(e.getMessage());

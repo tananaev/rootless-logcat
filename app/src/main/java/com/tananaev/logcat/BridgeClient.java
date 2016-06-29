@@ -3,6 +3,7 @@ package com.tananaev.logcat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,6 +15,13 @@ public class BridgeClient {
 
     private InputStream inputStream;
     private OutputStream outputStream;
+
+    public BridgeClient(int port) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(port);
+        Socket socket = serverSocket.accept();
+        outputStream = socket.getOutputStream();
+        inputStream = socket.getInputStream();
+    }
 
     public BridgeClient(String host, int port) throws IOException {
         Socket socket = new Socket(host, port);

@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
 
-                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+                /*KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
                 kpg.initialize(512);
                 KeyPair kp = kpg.genKeyPair();
                 Key publicKey = kp.getPublic();
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 client.write(new BridgeMessage(
                         BridgeMessage.A_AUTH, 3, 0, key));
 
-                message = client.read();
+                message = client.read();*/
 
                 /*while (message.getCommand() == BridgeMessage.A_AUTH) {
 

@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.security.KeyPairGeneratorSpec;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,19 +18,15 @@ import com.tananaev.adblib.AdbStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Date;
-
-import javax.security.auth.x500.X500Principal;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -92,24 +87,20 @@ public class MainActivity extends AppCompatActivity {
         if (preferences.contains(KEY_PUBLIC)) {
             PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(
                     Base64.decode(preferences.getString(KEY_PUBLIC, null), Base64.DEFAULT)));
-
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null, null);
-            KeyStore.PrivateKeyEntry entry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(KEY_PRIVATE, null);
-            PrivateKey privateKey = entry.getPrivateKey();
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(
+                    Base64.decode(preferences.getString(KEY_PRIVATE, null), Base64.DEFAULT)));
 
             keyPair = new KeyPair(publicKey, privateKey);
         } else {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
-            kpg.initialize(new KeyPairGeneratorSpec.Builder(MainActivity.this)
-                    .setAlias(KEY_PRIVATE)
-                    .setSubject(new X500Principal("CN=key"))
-                    .setSerialNumber(BigInteger.ONE)
-                    .setStartDate(new Date(0))
-                    .setEndDate(new Date(Long.MAX_VALUE))
-                    .build());
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(2048);
             keyPair = kpg.generateKeyPair();
-            preferences.edit().putString(KEY_PUBLIC, Base64.encodeToString(keyPair.getPublic().getEncoded(), Base64.DEFAULT)).apply();
+
+            preferences
+                    .edit()
+                    .putString(KEY_PUBLIC, Base64.encodeToString(keyPair.getPublic().getEncoded(), Base64.DEFAULT))
+                    .putString(KEY_PRIVATE, Base64.encodeToString(keyPair.getPrivate().getEncoded(), Base64.DEFAULT))
+                    .apply();
         }
 
         return keyPair;

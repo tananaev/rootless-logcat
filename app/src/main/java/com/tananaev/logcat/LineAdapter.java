@@ -11,7 +11,7 @@ import java.util.List;
 
 public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> {
 
-    private static long MIN_TIME = 100;
+    private static final long MIN_TIME = 100;
 
     private List<Line> lines = new LinkedList<>();
 
@@ -31,6 +31,12 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             return textView;
         }
 
+    }
+
+    public void clear() {
+        lines.clear();
+        size = 0;
+        notifyDataSetChanged();
     }
 
     public boolean addItem(String line) {

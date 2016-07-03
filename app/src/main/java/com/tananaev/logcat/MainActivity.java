@@ -9,6 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.tananaev.adblib.AdbBase64;
 import com.tananaev.adblib.AdbConnection;
@@ -41,6 +44,27 @@ public class MainActivity extends AppCompatActivity {
     private KeyPair keyPair;
     private ReaderTask readerTask;
 
+    private MenuItem statusItem;
+    private MenuItem reconnectItem;
+
+    private static class StatusUpdate {
+        private int statusMessage;
+        private String line;
+
+        public StatusUpdate(int statusMessage, String line) {
+            this.statusMessage = statusMessage;
+            this.line = line;
+        }
+
+        public int getStatusMessage() {
+            return statusMessage;
+        }
+
+        public String getLine() {
+            return line;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,23 +85,50 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void stopReader() {
+        adapter.clear();
+        if (readerTask != null) {
+            readerTask.cancel(true);
+            readerTask = null;
+        }
+    }
 
+    private void restartReader() {
+        stopReader();
         readerTask = new ReaderTask();
         readerTask.execute();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        statusItem = menu.findItem(R.id.view_status);
+        reconnectItem = menu.findItem(R.id.action_reconnect);
 
-        readerTask.cancel(false);
-        readerTask = null;
+        restartReader();
+
+        return true;
     }
 
-    @SuppressWarnings("deprecation")
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        stopReader();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_reconnect) {
+            restartReader();
+            return true;
+        } else if (item.getItemId() == R.id.action_share) {
+            return true;
+        }
+        return false;
+    }
+
     private KeyPair getKeyPair() throws GeneralSecurityException, IOException {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
@@ -85,16 +136,18 @@ public class MainActivity extends AppCompatActivity {
         KeyPair keyPair;
 
         if (preferences.contains(KEY_PUBLIC)) {
-            PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(
                     Base64.decode(preferences.getString(KEY_PUBLIC, null), Base64.DEFAULT)));
-            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(
+            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(
                     Base64.decode(preferences.getString(KEY_PRIVATE, null), Base64.DEFAULT)));
 
             keyPair = new KeyPair(publicKey, privateKey);
         } else {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
-            keyPair = kpg.generateKeyPair();
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(2048);
+            keyPair = generator.generateKeyPair();
 
             preferences
                     .edit()
@@ -106,12 +159,16 @@ public class MainActivity extends AppCompatActivity {
         return keyPair;
     }
 
-    private class ReaderTask extends AsyncTask<Void, String, Void> {
+    private class ReaderTask extends AsyncTask<Void, StatusUpdate, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
 
+            AdbConnection connection = null;
+
             try {
+
+                publishProgress(new StatusUpdate(R.string.status_connecting, null));
 
                 Socket socket = new Socket("localhost", 5555);
 
@@ -122,18 +179,30 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }, keyPair);
 
-                AdbConnection connection = AdbConnection.create(socket, crypto);
+                connection = AdbConnection.create(socket, crypto);
 
                 connection.connect();
 
+                publishProgress(new StatusUpdate(R.string.status_opening, null));
+
                 AdbStream stream = connection.open("shell:export ANDROID_LOG_TAGS=\"''\"; exec logcat");
 
+                publishProgress(new StatusUpdate(R.string.status_active, null));
+
                 BufferedReader reader = new BufferedReader(new InputStreamReader(new AdbInputStream(stream)));
-                while (true) {
-                    publishProgress(reader.readLine());
+                while (!isCancelled()) {
+                    publishProgress(new StatusUpdate(0, reader.readLine()));
                 }
 
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (IOException ee) {
+                        Log.w(TAG, ee);
+                    }
+                }
+            } catch (IOException e) {
                 Log.w(TAG, e);
             }
 
@@ -141,10 +210,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onProgressUpdate(String... items) {
-            for (String item : items) {
-                if (adapter.addItem(item)) {
-                    recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+        protected void onProgressUpdate(StatusUpdate... items) {
+            for (StatusUpdate statusUpdate : items) {
+                if (statusUpdate.getStatusMessage() != 0) {
+                    statusItem.setTitle(statusUpdate.getStatusMessage());
+                    reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
+                }
+                if (statusUpdate.getLine() != null) {
+                    if (adapter.addItem(statusUpdate.getLine())) {
+                        recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+                    }
                 }
             }
         }

@@ -50,7 +50,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String KEY_PUBLIC = "publicKey";
     private static final String KEY_PRIVATE = "privateKey";
+
+    private static final String KEY_WARNING_SHOWN = "warningShown";
 
     private static final String TEMP_FILE = "/logcat.txt";
 
@@ -128,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
             keyPair = getKeyPair(); // crashes on non-main thread
         } catch (GeneralSecurityException | IOException e) {
             Log.w(TAG, e);
+        }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!preferences.getBoolean(KEY_WARNING_SHOWN, false)) {
+            new WarningFragment().show(getFragmentManager(), null);
+            preferences.edit().putBoolean(KEY_WARNING_SHOWN, true).apply();
         }
     }
 
@@ -218,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
     private KeyPair getKeyPair() throws GeneralSecurityException, IOException {
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         KeyPair keyPair;
 
@@ -277,7 +285,12 @@ public class MainActivity extends AppCompatActivity {
                 publishProgress(new StatusUpdate(R.string.status_active, null));
 
                 while (!isCancelled()) {
-                    List<String> lines = Arrays.asList(new String(stream.read()).split("\\r?\\n"));
+                    List<String> lines = new ArrayList<>();
+                    for (String line : new String(stream.read()).split("\\r?\\n")) {
+                        if (!line.isEmpty()) {
+                            lines.add(line);
+                        }
+                    }
                     publishProgress(new StatusUpdate(0, lines));
                 }
 

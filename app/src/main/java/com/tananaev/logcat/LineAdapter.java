@@ -74,17 +74,15 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         holder.getTextView().setText(item.getContent());
         Context context = holder.getTextView().getContext();
         switch (item.getContent().charAt(0)) {
-            case 'V':
-            case 'D':
-            case 'I':
-                holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorNormal));
-                break;
             case 'W':
                 holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorWarning));
                 break;
             case 'E':
             case 'A':
                 holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorError));
+                break;
+            default:
+                holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorNormal));
                 break;
         }
     }

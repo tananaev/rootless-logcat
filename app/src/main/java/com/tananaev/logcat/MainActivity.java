@@ -5,8 +5,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_PUBLIC = "publicKey";
     private static final String KEY_PRIVATE = "privateKey";
 
+    public static final long ANIMATION_DURATION = 75;
+
     private RecyclerView recyclerView;
     private LineAdapter adapter;
 
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem statusItem;
     private MenuItem reconnectItem;
     private MenuItem scrollItem;
+    private MenuItem shareItem;
 
     private boolean scroll = true;
 
@@ -77,6 +82,13 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+
+        SimpleItemAnimator animator = new DefaultItemAnimator();
+        animator.setMoveDuration(ANIMATION_DURATION);
+        animator.setAddDuration(ANIMATION_DURATION);
+        animator.setChangeDuration(ANIMATION_DURATION);
+        animator.setRemoveDuration(ANIMATION_DURATION);
+        recyclerView.setItemAnimator(animator);
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -128,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         statusItem = menu.findItem(R.id.view_status);
         reconnectItem = menu.findItem(R.id.action_reconnect);
         scrollItem = menu.findItem(R.id.action_scroll);
+        shareItem = menu.findItem(R.id.action_share);
 
         restartReader();
 
@@ -211,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 
                 publishProgress(new StatusUpdate(R.string.status_opening, null));
 
-                AdbStream stream = connection.open("shell:export ANDROID_LOG_TAGS=\"''\"; exec logcat");
+                AdbStream stream = connection.open("shell:logcat");
 
                 publishProgress(new StatusUpdate(R.string.status_active, null));
 
@@ -242,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
                     statusItem.setTitle(statusUpdate.getStatusMessage());
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLine() != null) {
                     if (adapter.addItem(statusUpdate.getLine()) && scroll) {

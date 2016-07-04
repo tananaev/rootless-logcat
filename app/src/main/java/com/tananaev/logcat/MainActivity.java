@@ -46,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
     private MenuItem statusItem;
     private MenuItem reconnectItem;
+    private MenuItem scrollItem;
+
+    private boolean scroll = true;
 
     private static class StatusUpdate {
         private int statusMessage;
@@ -75,6 +78,15 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    updateScrollState(false);
+                }
+            }
+        });
+
         adapter = new LineAdapter();
         recyclerView.setAdapter(adapter);
 
@@ -82,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
             keyPair = getKeyPair(); // crashes on non-main thread
         } catch (GeneralSecurityException | IOException e) {
             Log.w(TAG, e);
+        }
+    }
+
+    private void updateScrollState(boolean scroll) {
+        this.scroll = scroll;
+        if (scroll) {
+            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom_white_24dp);
+            recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+        } else {
+            scrollItem.setIcon(R.drawable.ic_vertical_align_center_white_24dp);
         }
     }
 
@@ -105,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main, menu);
         statusItem = menu.findItem(R.id.view_status);
         reconnectItem = menu.findItem(R.id.action_reconnect);
+        scrollItem = menu.findItem(R.id.action_scroll);
 
         restartReader();
 
@@ -122,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_reconnect) {
             restartReader();
+            return true;
+        } else if (item.getItemId() == R.id.action_scroll) {
+            updateScrollState(!scroll);
             return true;
         } else if (item.getItemId() == R.id.action_share) {
             return true;
@@ -215,9 +241,10 @@ public class MainActivity extends AppCompatActivity {
                 if (statusUpdate.getStatusMessage() != 0) {
                     statusItem.setTitle(statusUpdate.getStatusMessage());
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
+                    scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLine() != null) {
-                    if (adapter.addItem(statusUpdate.getLine())) {
+                    if (adapter.addItem(statusUpdate.getLine()) && scroll) {
                         recyclerView.scrollToPosition(adapter.getItemCount() - 1);
                     }
                 }

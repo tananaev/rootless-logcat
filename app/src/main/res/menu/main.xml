@@ -16,6 +16,13 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_scroll"
+        android:icon="@drawable/ic_vertical_align_bottom_white_24dp"
+        android:title="@string/menu_scroll"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_white_24dp"
         android:title="@string/menu_share"

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Logcat</string>
     <string name="menu_reconnect">Reconnect</string>
+    <string name="menu_scroll">Scroll</string>
     <string name="menu_share">Share</string>
     <string name="status_connecting">Connecting…</string>
     <string name="status_opening">Opening…</string>

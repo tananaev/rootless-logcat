@@ -1,5 +1,6 @@
 package com.tananaev.logcat;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,10 +60,26 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         return new LineViewHolder(view);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBindViewHolder(LineViewHolder holder, int position) {
         Line item = lines.get(position);
         holder.getTextView().setText(item.getContent());
+        Context context = holder.getTextView().getContext();
+        switch (item.getContent().charAt(0)) {
+            case 'V':
+            case 'D':
+            case 'I':
+                holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorNormal));
+                break;
+            case 'W':
+                holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorWarning));
+                break;
+            case 'E':
+            case 'A':
+                holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorError));
+                break;
+        }
     }
 
     @Override

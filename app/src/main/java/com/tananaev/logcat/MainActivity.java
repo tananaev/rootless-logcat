@@ -37,12 +37,10 @@ import com.tananaev.adblib.AdbConnection;
 import com.tananaev.adblib.AdbCrypto;
 import com.tananaev.adblib.AdbStream;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -52,6 +50,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -79,19 +79,19 @@ public class MainActivity extends AppCompatActivity {
 
     private static class StatusUpdate {
         private int statusMessage;
-        private String line;
+        private List<String> lines;
 
-        public StatusUpdate(int statusMessage, String line) {
+        public StatusUpdate(int statusMessage, List<String> lines) {
             this.statusMessage = statusMessage;
-            this.line = line;
+            this.lines = lines;
         }
 
         public int getStatusMessage() {
             return statusMessage;
         }
 
-        public String getLine() {
-            return line;
+        public List<String> getLines() {
+            return lines;
         }
     }
 
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
         KeyPair keyPair;
 
-        if (preferences.contains(KEY_PUBLIC)) {
+        if (preferences.contains(KEY_PUBLIC) && preferences.contains(KEY_PRIVATE)) {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
             PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(
@@ -272,13 +272,13 @@ public class MainActivity extends AppCompatActivity {
 
                 publishProgress(new StatusUpdate(R.string.status_opening, null));
 
-                AdbStream stream = connection.open("shell:logcat");
+                AdbStream stream = connection.open("shell:logcat -v brief");
 
                 publishProgress(new StatusUpdate(R.string.status_active, null));
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new AdbInputStream(stream)));
                 while (!isCancelled()) {
-                    publishProgress(new StatusUpdate(0, reader.readLine()));
+                    List<String> lines = Arrays.asList(new String(stream.read()).split("\\r?\\n"));
+                    publishProgress(new StatusUpdate(0, lines));
                 }
 
             } catch (InterruptedException e) {
@@ -305,8 +305,9 @@ public class MainActivity extends AppCompatActivity {
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
-                if (statusUpdate.getLine() != null) {
-                    if (adapter.addItem(statusUpdate.getLine()) && scroll) {
+                if (statusUpdate.getLines() != null) {
+                    adapter.addItems(statusUpdate.getLines());
+                    if (scroll) {
                         recyclerView.scrollToPosition(adapter.getItemCount() - 1);
                     }
                 }

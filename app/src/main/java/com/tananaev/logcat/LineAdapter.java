@@ -27,12 +27,7 @@ import java.util.List;
 
 public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> {
 
-    private static final long MIN_TIME = 100;
-
     private List<Line> lines = new LinkedList<>();
-
-    private long updated = System.currentTimeMillis();
-    private int size = 0;
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
 
@@ -55,21 +50,14 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     public void clear() {
         lines.clear();
-        size = 0;
         notifyDataSetChanged();
     }
 
-    public boolean addItem(String line) {
-        lines.add(new Line(line));
-        if (System.currentTimeMillis() - updated > MIN_TIME) {
-            notifyItemRangeInserted(size, lines.size() - size);
-            updated = System.currentTimeMillis();
-            size = lines.size();
-            return true;
-        } else {
-            updated = System.currentTimeMillis();
-            return false;
+    public void addItems(List<String> lines) {
+        for (String line : lines) {
+            this.lines.add(new Line(line));
         }
+        notifyItemRangeInserted(this.lines.size() - lines.size(), lines.size());
     }
 
     @Override
@@ -103,7 +91,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     @Override
     public int getItemCount() {
-        return size;
+        return lines.size();
     }
 
 }

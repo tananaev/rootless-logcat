@@ -16,6 +16,13 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/menu_search"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_scroll"
         android:icon="@drawable/ic_vertical_align_bottom_white_24dp"
         android:title="@string/menu_scroll"

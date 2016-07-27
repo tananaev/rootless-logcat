@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem reconnectItem;
     private MenuItem scrollItem;
     private MenuItem shareItem;
+    private MenuItem searchItem;
 
     private boolean scroll = true;
 
@@ -189,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         reconnectItem = menu.findItem(R.id.action_reconnect);
         scrollItem = menu.findItem(R.id.action_scroll);
         shareItem = menu.findItem(R.id.action_share);
+        searchItem = menu.findItem(R.id.action_search);
 
         restartReader();
 
@@ -212,6 +214,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (item.getItemId() == R.id.action_share) {
             startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
+            return true;
+        } else if (item.getItemId() == R.id.action_search) {
+            // TODO: add search logic
             return true;
         }
         return false;
@@ -278,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {
                     adapter.addItems(statusUpdate.getLines());

@@ -286,8 +286,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            //Reader reader = new RemoteReader(keyPair);
-            Reader reader = new LocalReader();
+            Reader reader = new RemoteReader(keyPair);
+            //Reader reader = new LocalReader();
 
             reader.read(new Reader.UpdateHandler() {
                 @Override

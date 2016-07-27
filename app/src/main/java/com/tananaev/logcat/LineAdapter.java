@@ -27,7 +27,10 @@ import java.util.List;
 
 public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> {
 
-    private List<Line> lines = new LinkedList<>();
+    private List<Line> linesAll = new LinkedList<>();
+    private List<Line> linesFiltered = new LinkedList<>();
+
+    private String keyword;
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
 
@@ -45,19 +48,44 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     }
 
     public List<Line> getLines() {
-        return lines;
+        return linesFiltered;
     }
 
     public void clear() {
-        lines.clear();
+        linesAll.clear();
+        linesFiltered.clear();
         notifyDataSetChanged();
     }
 
     public void addItems(List<String> lines) {
+        List<Line> linesAll = new LinkedList<>();
         for (String line : lines) {
-            this.lines.add(new Line(line));
+            linesAll.add(new Line(line));
         }
-        notifyItemRangeInserted(this.lines.size() - lines.size(), lines.size());
+        this.linesAll.addAll(linesAll);
+        List<Line> linesFiltered = filter(linesAll);
+        this.linesFiltered.addAll(linesFiltered);
+        notifyItemRangeInserted(this.linesFiltered.size() - linesFiltered.size(), linesFiltered.size());
+    }
+
+    private List<Line> filter(List<Line> lines) {
+        List<Line> linesFiltered = new LinkedList<>();
+        if (keyword == null || keyword.isEmpty()) {
+            linesFiltered.addAll(lines);
+        } else {
+            for (Line line : lines) {
+                if (line.getContent().contains(keyword)) {
+                    linesFiltered.add(line);
+                }
+            }
+        }
+        return linesFiltered;
+    }
+
+    public void filter(String keyword) {
+        this.keyword = keyword;
+        linesFiltered = filter(linesAll);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -70,7 +98,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     @SuppressWarnings("deprecation")
     @Override
     public void onBindViewHolder(LineViewHolder holder, int position) {
-        Line item = lines.get(position);
+        Line item = linesFiltered.get(position);
         holder.getTextView().setText(item.getContent());
         Context context = holder.getTextView().getContext();
         switch (item.getLevel()) {
@@ -89,7 +117,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     @Override
     public int getItemCount() {
-        return lines.size();
+        return linesFiltered.size();
     }
 
 }

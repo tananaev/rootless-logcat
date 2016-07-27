@@ -32,16 +32,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.tananaev.adblib.AdbBase64;
-import com.tananaev.adblib.AdbConnection;
-import com.tananaev.adblib.AdbCrypto;
-import com.tananaev.adblib.AdbStream;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -50,7 +44,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -259,52 +252,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            AdbConnection connection = null;
+            //Reader reader = new RemoteReader(keyPair);
+            Reader reader = new LocalReader();
 
-            try {
-
-                publishProgress(new StatusUpdate(R.string.status_connecting, null));
-
-                Socket socket = new Socket("localhost", 5555);
-
-                AdbCrypto crypto = AdbCrypto.loadAdbKeyPair(new AdbBase64() {
-                    @Override
-                    public String encodeToString(byte[] data) {
-                        return Base64.encodeToString(data, Base64.DEFAULT);
-                    }
-                }, keyPair);
-
-                connection = AdbConnection.create(socket, crypto);
-
-                connection.connect();
-
-                publishProgress(new StatusUpdate(R.string.status_opening, null));
-
-                AdbStream stream = connection.open("shell:logcat -v brief");
-
-                publishProgress(new StatusUpdate(R.string.status_active, null));
-
-                while (!isCancelled()) {
-                    List<String> lines = new ArrayList<>();
-                    for (String line : new String(stream.read()).split("\\r?\\n")) {
-                        if (!line.isEmpty()) {
-                            lines.add(line);
-                        }
-                    }
-                    publishProgress(new StatusUpdate(0, lines));
+            reader.read(new Reader.UpdateHandler() {
+                @Override
+                public boolean isCancelled() {
+                    return ReaderTask.this.isCancelled();
                 }
 
-            } catch (InterruptedException e) {
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (IOException ee) {
-                        Log.w(TAG, ee);
-                    }
+                @Override
+                public void update(int status, List<String> lines) {
+                    publishProgress(new StatusUpdate(status, lines));
                 }
-            } catch (IOException e) {
-                Log.w(TAG, e);
-            }
+            });
 
             return null;
         }

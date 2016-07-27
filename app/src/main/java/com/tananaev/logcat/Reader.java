@@ -15,30 +15,15 @@
  */
 package com.tananaev.logcat;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
-public class Line {
+public interface Reader {
 
-    private static Pattern linePattern = Pattern.compile("\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d (\\w)/.*");
-
-    private char level = 'D';
-    private String content;
-
-    public Line(String content) {
-        this.content = content;
-        Matcher matcher = linePattern.matcher(content);
-        if (matcher.matches()) {
-            level = matcher.group(1).charAt(0);
-        }
+    interface UpdateHandler {
+        boolean isCancelled();
+        void update(int status, List<String> lines);
     }
 
-    public char getLevel() {
-        return level;
-    }
-
-    public String getContent() {
-        return content;
-    }
+    void read(UpdateHandler updateHandler);
 
 }

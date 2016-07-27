@@ -73,7 +73,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         Line item = lines.get(position);
         holder.getTextView().setText(item.getContent());
         Context context = holder.getTextView().getContext();
-        switch (item.getContent().charAt(0)) {
+        switch (item.getLevel()) {
             case 'W':
                 holder.getTextView().setTextColor(context.getResources().getColor(R.color.colorWarning));
                 break;

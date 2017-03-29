@@ -1,6 +1,6 @@
 # Android Logcat without Root
 
-[![](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.tananaev.logcat)
+[![Get it on Google Play](http://www.tananaev.com/badges/google-play.svg)](https://play.google.com/store/apps/details?id=com.tananaev.logcat)
 
 Read Android logs without root access. The app uses remote debugging to connect to phone local ADB daemon. Configuring remote debugging on a phone can be challenging and requires some technical expertise. It has to be done once and after each device reboot.
 

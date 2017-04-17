@@ -5,12 +5,10 @@
     <string name="menu_scroll">Scroll</string>
     <string name="menu_share">Teilen</string>
     <string name="menu_search">Suche</string>
-    <string name="status_connecting">Verbinde...</string>
-    <string name="status_opening">Öffne...</string>
+    <string name="status_connecting">Verbinde…</string>
+    <string name="status_opening">Öffne…</string>
     <string name="status_active">Aktiv</string>
     <string name="warning_close">Schließen</string>
     <string name="warning_more">Mehr info</string>
-    <string name="warning_text">Um diese App nutzen zu können muss \"ADB über Netzwerk\" aktiviert werden. Mit dem folgenden adb Befehl kannst du es aktivieren: \n
- \n
- adb tcpip 5555</string>
+    <string name="warning_text">Um diese App nutzen zu können muss \"ADB über Netzwerk\" aktiviert werden. Mit dem folgenden adb Befehl kannst du es aktivieren:\n\nadb tcpip 5555</string>
 </resources>

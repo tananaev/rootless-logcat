@@ -6,4 +6,6 @@
     <color name="colorNormal">#212121</color>
     <color name="colorWarning">#00007f</color>
     <color name="colorError">#7f0000</color>
+    <color name="row_bg_color_odd">@android:color/white</color>
+    <color name="row_bg_color_even">#eee</color>
 </resources>

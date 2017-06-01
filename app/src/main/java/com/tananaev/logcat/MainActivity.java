@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         if (file.exists()) {
             file.delete();
         }
-        try  {
+        try {
             file.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             for (Line line : adapter.getLines()) {
@@ -231,14 +231,18 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
-        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+        final EditText inputTag = (EditText) viewInflated.findViewById(R.id.tag);
+        final EditText inputSearch = (EditText) viewInflated.findViewById(R.id.input);
+
+        inputTag.setText(adapter.getTag());
+        inputSearch.setText(adapter.getKeyword());
         builder.setView(viewInflated);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                adapter.filter(input.getText().toString());
+                adapter.filter(inputTag.getText().toString(), inputSearch.getText().toString());
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

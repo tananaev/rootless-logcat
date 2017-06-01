@@ -15,21 +15,33 @@
  */
 package com.tananaev.logcat;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Line {
 
-    private static Pattern linePattern = Pattern.compile("\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d (\\w)/.*");
+    private static Pattern linePattern = Pattern.compile("\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d (\\w)/(\\w+).*");
 
-    private char level = 'D';
-    private String content;
+    private final char level;
+    @NonNull
+    private final String lowerTag;
+    @NonNull
+    private final String content;
+    @Nullable
+    private String lowerContent;
 
-    public Line(String content) {
+    public Line(@NonNull String content) {
         this.content = content;
         Matcher matcher = linePattern.matcher(content);
         if (matcher.matches()) {
             level = matcher.group(1).charAt(0);
+            lowerTag = matcher.group(2).toString().trim().toLowerCase();
+        } else {
+            level = 'D';
+            lowerTag = "";
         }
     }
 
@@ -37,8 +49,25 @@ public class Line {
         return level;
     }
 
+    @NonNull
+    public String getLowerTag() {
+        if (lowerTag == null) {
+            return "";
+        }
+        return lowerTag;
+    }
+
+    @NonNull
     public String getContent() {
         return content;
+    }
+
+    @NonNull
+    public String getLowerContent() {
+        if (lowerContent == null) {
+            lowerContent = content.toLowerCase();
+        }
+        return lowerContent;
     }
 
 }

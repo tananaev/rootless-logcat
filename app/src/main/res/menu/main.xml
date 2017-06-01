@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/view_status"
-        android:title="@string/status_connecting"
         android:enabled="false"
-        app:showAsAction="always"/>
+        android:title="@string/status_connecting"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_reconnect"
         android:icon="@drawable/ic_sync_white_24dp"
         android:title="@string/menu_reconnect"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="@string/menu_search"
         android:visible="false"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_scroll"
         android:icon="@drawable/ic_vertical_align_bottom_white_24dp"
         android:title="@string/menu_scroll"
         android:visible="false"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_share"
         android:icon="@drawable/ic_share_white_24dp"
         android:title="@string/menu_share"
         android:visible="false"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="@string/delete"
+        android:visible="false"
+        app:showAsAction="always" />
 </menu>

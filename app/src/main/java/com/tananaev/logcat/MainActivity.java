@@ -19,6 +19,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem scrollItem;
     private MenuItem shareItem;
     private MenuItem searchItem;
+    private MenuItem clearItem;
 
     private boolean scroll = true;
 
@@ -201,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
         scrollItem = menu.findItem(R.id.action_scroll);
         shareItem = menu.findItem(R.id.action_share);
         searchItem = menu.findItem(R.id.action_search);
+        clearItem = menu.findItem(R.id.action_delete);
 
         restartReader();
 
@@ -227,6 +230,19 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (item.getItemId() == R.id.action_search) {
             showSearchDialog();
+            return true;
+        } else if (item.getItemId() == R.id.action_delete) {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage(R.string.clear_log_confirm)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            adapter.clear();
+                        }
+                    })
+                    .show();
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
             return true;
         }
         return false;
@@ -379,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    clearItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {
                     adapter.addItems(statusUpdate.getLines());

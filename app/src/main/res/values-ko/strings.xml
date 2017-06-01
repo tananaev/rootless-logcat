@@ -13,4 +13,7 @@
     <string name="warning_more">추가 정보</string>
     <string name="warning_text">이 앱을 정상적으로 사용하기 위해서 아래의 ADB 명령어를 실행해야 합니다.\n\nadb tcpip 5555</string>
     <string name="menu_tag">태그</string>
+    <string name="clear_log_confirm">모두 삭제할까요?</string>
+    <string name="cancel">취소</string>
+    <string name="delete">삭제</string>
 </resources>

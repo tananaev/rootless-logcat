@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/tag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,8 +18,8 @@
             android:inputType="text"
             android:maxLines="1" />
 
-        <EditText
-            android:id="@+id/input"
+        <AutoCompleteTextView
+            android:id="@+id/keyword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/menu_search"

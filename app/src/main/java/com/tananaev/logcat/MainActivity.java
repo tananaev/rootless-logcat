@@ -15,6 +15,7 @@
  */
 package com.tananaev.logcat;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,14 +29,18 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -227,22 +232,31 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+
     private void showSearchDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
-        final EditText inputTag = (EditText) viewInflated.findViewById(R.id.tag);
-        final EditText inputSearch = (EditText) viewInflated.findViewById(R.id.input);
+        final AutoCompleteTextView inputTag = (AutoCompleteTextView) viewInflated.findViewById(R.id.tag);
+        final AutoCompleteTextView inputKeyword = (AutoCompleteTextView) viewInflated.findViewById(R.id.keyword);
+
+        final String[] tagHistory = Settings.getTagHistory(this);
+        setAutoCompleteTextViewAdapter(inputTag, tagHistory);
+        final String[] keywordHistory = Settings.getKeywordHistory(this);
+        setAutoCompleteTextViewAdapter(inputKeyword, keywordHistory);
 
         inputTag.setText(adapter.getTag());
-        inputSearch.setText(adapter.getKeyword());
+        inputKeyword.setText(adapter.getKeyword());
         builder.setView(viewInflated);
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                adapter.filter(inputTag.getText().toString(), inputSearch.getText().toString());
+                String tag = inputTag.getText().toString();
+                String keyword = inputKeyword.getText().toString();
+                adapter.filter(tag, keyword);
+                Settings.appendTagHistory(MainActivity.this, tagHistory, keywordHistory, tag, keyword);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -252,7 +266,55 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.show();
+        Dialog dialog = builder.create();
+        dialog.getWindow().setGravity(Gravity.TOP);
+        dialog.show();
+    }
+
+    private void setAutoCompleteTextViewAdapter(final AutoCompleteTextView autoCompleteTextView, String[] history) {
+
+        ArrayAdapter<String> tagAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, history);
+        autoCompleteTextView.setThreshold(1);
+        autoCompleteTextView.setAdapter(tagAdapter);
+
+        autoCompleteTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (autoCompleteTextView.length() == 0) {
+                    autoCompleteTextView.showDropDown();
+                }
+            }
+        });
+
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            boolean skipFirst = true;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    if (skipFirst) {
+                        skipFirst = false;
+                        return;
+                    }
+                    autoCompleteTextView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            autoCompleteTextView.showDropDown();
+                        }
+                    }, 100);
+                }
+            }
+        });
     }
 
     private KeyPair getKeyPair() throws GeneralSecurityException, IOException {

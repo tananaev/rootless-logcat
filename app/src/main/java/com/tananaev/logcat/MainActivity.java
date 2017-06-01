@@ -255,6 +255,18 @@ public class MainActivity extends AppCompatActivity {
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
         final AutoCompleteTextView inputTag = (AutoCompleteTextView) viewInflated.findViewById(R.id.tag);
         final AutoCompleteTextView inputKeyword = (AutoCompleteTextView) viewInflated.findViewById(R.id.keyword);
+        viewInflated.findViewById(R.id.clear_tag).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inputTag.setText("");
+            }
+        });
+        viewInflated.findViewById(R.id.clear_keyword).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inputKeyword.setText("");
+            }
+        });
 
         final String[] tagHistory = Settings.getTagHistory(this);
         setAutoCompleteTextViewAdapter(inputTag, tagHistory);

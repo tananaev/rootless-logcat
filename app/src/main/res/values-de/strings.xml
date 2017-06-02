@@ -15,4 +15,5 @@
     <string name="clear_log_confirm">Delete all log?</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="menu_filter">Filter</string>
 </resources>

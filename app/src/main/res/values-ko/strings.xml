@@ -16,4 +16,5 @@
     <string name="clear_log_confirm">모두 삭제할까요?</string>
     <string name="cancel">취소</string>
     <string name="delete">삭제</string>
+    <string name="menu_filter">필터</string>
 </resources>

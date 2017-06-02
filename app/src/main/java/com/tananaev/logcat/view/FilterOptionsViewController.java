@@ -25,7 +25,7 @@ public class FilterOptionsViewController {
 
     public FilterOptionsViewController(Context context) {
         this.context = context;
-        baseView = LayoutInflater.from(context).inflate(R.layout.dialog_search, null);
+        baseView = LayoutInflater.from(context).inflate(R.layout.dialog_filter, null);
         inputTag = (AutoCompleteTextView) baseView.findViewById(R.id.tag);
         inputKeyword = (AutoCompleteTextView) baseView.findViewById(R.id.keyword);
 

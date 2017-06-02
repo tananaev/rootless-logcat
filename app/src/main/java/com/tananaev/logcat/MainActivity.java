@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem reconnectItem;
     private MenuItem scrollItem;
     private MenuItem shareItem;
-    private MenuItem searchItem;
+    private MenuItem filterItem;
     private MenuItem clearItem;
 
     private boolean scroll = true;
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         reconnectItem = menu.findItem(R.id.action_reconnect);
         scrollItem = menu.findItem(R.id.action_scroll);
         shareItem = menu.findItem(R.id.action_share);
-        searchItem = menu.findItem(R.id.action_search);
+        filterItem = menu.findItem(R.id.action_filter);
         clearItem = menu.findItem(R.id.action_delete);
 
         restartReader();
@@ -224,8 +224,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.action_share) {
             startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
             return true;
-        } else if (item.getItemId() == R.id.action_search) {
-            showSearchDialog();
+        } else if (item.getItemId() == R.id.action_filter) {
+            showFilterDialog();
             return true;
         } else if (item.getItemId() == R.id.action_delete) {
             AlertDialog dialog = new AlertDialog.Builder(this)
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showSearchDialog() {
+    private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         final FilterOptionsViewController filterOptionsViewController = new FilterOptionsViewController(this);
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    filterItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     clearItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {

@@ -15,9 +15,9 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_white_24dp"
-        android:title="@string/menu_search"
+        android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter_white_18dp"
+        android:title="@string/menu_filter"
         android:visible="false"
         app:showAsAction="always" />
 

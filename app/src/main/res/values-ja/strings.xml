@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Logcat</string>
+    <string name="app_name_short">ログ</string>
+    <string name="menu_reconnect">再接続</string>
+    <string name="menu_scroll">スクロール</string>
+    <string name="menu_share">共有</string>
+    <string name="menu_search">検索</string>
+    <string name="status_connecting">接続しています…</string>
+    <string name="status_opening">開いています…</string>
+    <string name="status_active">アクティブ</string>
+    <string name="warning_close">閉じる</string>
+    <string name="warning_more">詳細情報</string>
+    <string name="warning_text">このアプリの動作には、電話で次の adb コマンドを使用してリモートデバッグを有効にする必要があります:\n\nadb tcpip 5555</string>
+</resources>

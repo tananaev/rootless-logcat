@@ -216,37 +216,40 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_reconnect) {
-            restartReader();
-            return true;
-        } else if (item.getItemId() == R.id.action_scroll) {
-            updateScrollState(!scroll);
-            return true;
-        } else if (item.getItemId() == R.id.action_share) {
-            startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
-            return true;
-        } else if (item.getItemId() == R.id.action_filter) {
-            showFilterDialog();
-            return true;
-        } else if (item.getItemId() == R.id.action_delete) {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setMessage(R.string.clear_log_confirm)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            adapter.clear();
-                        }
-                    })
-                    .show();
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
-            return true;
-        } else if (item.getItemId() == R.id.action_search) {
-            showSearchDialog();
+        switch (item.getItemId()) {
+            case R.id.action_reconnect:
+                restartReader();
+                break;
+            case R.id.action_scroll:
+                updateScrollState(!scroll);
+                break;
+            case R.id.action_share:
+                startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
+                break;
+            case R.id.action_filter:
+                showFilterDialog();
+                break;
+            case R.id.action_delete:
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setMessage(R.string.clear_log_confirm)
+                        .setNegativeButton(R.string.cancel, null)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.clear();
+                            }
+                        })
+                        .show();
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+                break;
+            case R.id.action_search:
+                showSearchDialog();
+                break;
+            default:
+                return false;
         }
-        return false;
+        return true;
     }
-
 
     private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

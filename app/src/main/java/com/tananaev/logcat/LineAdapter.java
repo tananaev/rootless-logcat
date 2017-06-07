@@ -42,6 +42,10 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     private String keyword = "";
     @NonNull
     private String lowerKeyword = "";
+    @NonNull
+    private String searchWord = "";
+    @NonNull
+    private String lowerSearchWord = "";
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
 
@@ -119,6 +123,16 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         notifyDataSetChanged();
     }
 
+    public void search(@NonNull String searchWord) {
+        this.searchWord = searchWord;
+        this.lowerSearchWord = searchWord.toLowerCase();
+        notifyDataSetChanged();
+    }
+
+    public String getSearchWord() {
+        return searchWord;
+    }
+
     @Override
     public LineViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
@@ -131,13 +145,27 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     public void onBindViewHolder(LineViewHolder holder, int position) {
         Line item = linesFiltered.get(position);
         String text = item.getContent();
-        if (!TextUtils.isEmpty(lowerKeyword)) {
+        if (!TextUtils.isEmpty(lowerKeyword) || !TextUtils.isEmpty(lowerSearchWord)) {
             SpannableString spannableText = new SpannableString(text);
             String lowerContent = item.getLowerContent();
-            int index = 0, found;
-            while ((found = lowerContent.indexOf(lowerKeyword, index)) >= 0) {
-                spannableText.setSpan(new BackgroundColorSpan(Color.RED), found, found + lowerKeyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                index = found + lowerKeyword.length();
+
+            // filter keyword
+            if (!TextUtils.isEmpty(lowerKeyword)) {
+
+                int index = 0, found;
+                while ((found = lowerContent.indexOf(lowerKeyword, index)) >= 0) {
+                    spannableText.setSpan(new BackgroundColorSpan(Color.RED), found, found + lowerKeyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    index = found + lowerKeyword.length();
+                }
+            }
+
+            // highlight search word
+            if (!TextUtils.isEmpty(lowerSearchWord)) {
+                int index = 0, found;
+                while ((found = lowerContent.indexOf(lowerSearchWord, index)) >= 0) {
+                    spannableText.setSpan(new BackgroundColorSpan(Color.YELLOW), found, found + lowerSearchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    index = found + lowerSearchWord.length();
+                }
             }
             holder.getTextView().setText(spannableText);
         } else {

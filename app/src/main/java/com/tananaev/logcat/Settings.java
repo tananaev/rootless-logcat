@@ -11,12 +11,15 @@ public class Settings {
     private static final int MAX_COUNT = 10;
     private static final String KEY_TAG_HISTORY = "tagHistory";
     private static final String KEY_KEYWORD_HISTORY = "keywordHistory";
+    private static final String KEY_SEARCH_HISTORY = "searchHistory";
 
+    // for filtering
     @NonNull
     public static String[] getTagHistory(Context context) {
         return getHistory(context, KEY_TAG_HISTORY);
     }
 
+    // for filtering
     @NonNull
     public static String[] getKeywordHistory(Context context) {
         return getHistory(context, KEY_KEYWORD_HISTORY);
@@ -69,5 +72,22 @@ public class Settings {
         }
 
         return sb.toString();
+    }
+
+    // for highlighting
+    @NonNull
+    public static String[] getSearchHistory(Context context) {
+        return getHistory(context, KEY_SEARCH_HISTORY);
+    }
+
+    public static void appendSearchHistory(Context context, @NonNull String[] searchHistory, String newSearchWord) {
+        String searchHistoryData = makeHistoryData(searchHistory, newSearchWord);
+        if (TextUtils.isEmpty(searchHistoryData)) {
+            return;
+        }
+        SharedPreferences pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(KEY_SEARCH_HISTORY, searchHistoryData);
+        editor.apply();
     }
 }

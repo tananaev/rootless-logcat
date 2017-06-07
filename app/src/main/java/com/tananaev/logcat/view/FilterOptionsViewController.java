@@ -2,11 +2,8 @@ package com.tananaev.logcat.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 import com.tananaev.logcat.R;
@@ -14,9 +11,13 @@ import com.tananaev.logcat.Settings;
 
 public class FilterOptionsViewController {
 
+    @NonNull
     private final Context context;
+    @NonNull
     private final View baseView;
+    @NonNull
     private final AutoCompleteTextView inputTag;
+    @NonNull
     private final AutoCompleteTextView inputKeyword;
     @NonNull
     private final String[] tagHistory;
@@ -43,55 +44,9 @@ public class FilterOptionsViewController {
         });
 
         tagHistory = Settings.getTagHistory(context);
-        setAutoCompleteTextViewAdapter(inputTag, tagHistory);
+        ViewUtils.setAutoCompleteTextViewAdapter(context, inputTag, tagHistory);
         keywordHistory = Settings.getKeywordHistory(context);
-        setAutoCompleteTextViewAdapter(inputKeyword, keywordHistory);
-    }
-
-    private void setAutoCompleteTextViewAdapter(final AutoCompleteTextView autoCompleteTextView, String[] history) {
-
-        ArrayAdapter<String> tagAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, history);
-        autoCompleteTextView.setThreshold(1);
-        autoCompleteTextView.setAdapter(tagAdapter);
-
-        autoCompleteTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (autoCompleteTextView.length() == 0) {
-                    autoCompleteTextView.showDropDown();
-                }
-            }
-        });
-
-        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
-            boolean skipFirst = true;
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
-                    if (skipFirst) {
-                        skipFirst = false;
-                        return;
-                    }
-                    autoCompleteTextView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            autoCompleteTextView.showDropDown();
-                        }
-                    }, 100);
-                }
-            }
-        });
+        ViewUtils.setAutoCompleteTextViewAdapter(context, inputKeyword, keywordHistory);
     }
 
     public View getBaseView() {

@@ -38,6 +38,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.tananaev.logcat.view.FilterOptionsViewController;
+import com.tananaev.logcat.view.SearchOptionsViewController;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem shareItem;
     private MenuItem filterItem;
     private MenuItem clearItem;
+    private MenuItem searchItem;
 
     private boolean scroll = true;
 
@@ -200,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         shareItem = menu.findItem(R.id.action_share);
         filterItem = menu.findItem(R.id.action_filter);
         clearItem = menu.findItem(R.id.action_delete);
+        searchItem = menu.findItem(R.id.action_search);
 
         restartReader();
 
@@ -240,6 +243,8 @@ public class MainActivity extends AppCompatActivity {
                     .show();
             dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
             return true;
+        } else if (item.getItemId() == R.id.action_search) {
+            showSearchDialog();
         }
         return false;
     }
@@ -260,6 +265,33 @@ public class MainActivity extends AppCompatActivity {
                 String keyword = filterOptionsViewController.getKeyword();
                 adapter.filter(tag, keyword);
                 filterOptionsViewController.saveTagKeyword(tag, keyword);
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        Dialog dialog = builder.create();
+        dialog.getWindow().setGravity(Gravity.TOP);
+        dialog.show();
+    }
+
+    private void showSearchDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        final SearchOptionsViewController searchOptionsViewController = new SearchOptionsViewController(this);
+        searchOptionsViewController.setSearchWord(adapter.getSearchWord());
+        builder.setView(searchOptionsViewController.getBaseView());
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String searchWord = searchOptionsViewController.getSearchWord();
+                adapter.search(searchWord);
+                searchOptionsViewController.saveSearchWord(searchWord);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -337,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
                     shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     filterItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     clearItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {
                     adapter.addItems(statusUpdate.getLines());

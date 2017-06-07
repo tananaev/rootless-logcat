@@ -76,10 +76,9 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem statusItem;
     private MenuItem reconnectItem;
     private MenuItem scrollItem;
-    private MenuItem shareItem;
     private MenuItem filterItem;
-    private MenuItem clearItem;
     private MenuItem searchItem;
+    private MenuItem moreMenuItem;
 
     private boolean scroll = true;
 
@@ -199,10 +198,9 @@ public class MainActivity extends AppCompatActivity {
         statusItem = menu.findItem(R.id.view_status);
         reconnectItem = menu.findItem(R.id.action_reconnect);
         scrollItem = menu.findItem(R.id.action_scroll);
-        shareItem = menu.findItem(R.id.action_share);
         filterItem = menu.findItem(R.id.action_filter);
-        clearItem = menu.findItem(R.id.action_delete);
         searchItem = menu.findItem(R.id.action_search);
+        moreMenuItem = menu.findItem(R.id.action_more);
 
         restartReader();
 
@@ -366,10 +364,9 @@ public class MainActivity extends AppCompatActivity {
                     statusItem.setTitle(statusUpdate.getStatusMessage());
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     filterItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    clearItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    moreMenuItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {
                     adapter.addItems(statusUpdate.getLines());

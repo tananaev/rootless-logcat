@@ -11,9 +11,12 @@
     <string name="warning_close">Schließen</string>
     <string name="warning_more">Mehr info</string>
     <string name="warning_text">Um diese App nutzen zu können muss \"ADB über Netzwerk\" aktiviert werden. Mit dem folgenden adb Befehl kannst du es aktivieren:\n\nadb tcpip 5555</string>
-    <string name="menu_tag">Tag</string>
+    <string name="hint_filter_by_tag">Filter by tag</string>
     <string name="clear_log_confirm">Delete all log?</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="menu_filter">Filter</string>
+    <string name="menu_more">More menu</string>
+    <string name="hint_filter_by_keyword">Filter by keyword</string>
+    <string name="hint_highlight_keyword">Highlight keyword</string>
 </resources>

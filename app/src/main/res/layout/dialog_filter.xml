@@ -15,7 +15,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/menu_tag"
+            android:hint="@string/hint_filter_by_tag"
             android:imeOptions="actionNext"
             android:inputType="text"
             android:maxLines="1" />
@@ -40,7 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/menu_search"
+            android:hint="@string/hint_filter_by_keyword"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1" />

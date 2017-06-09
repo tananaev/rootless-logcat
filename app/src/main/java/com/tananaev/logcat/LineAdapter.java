@@ -15,9 +15,13 @@
  */
 package com.tananaev.logcat;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -27,6 +31,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -144,6 +151,8 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     @Override
     public void onBindViewHolder(LineViewHolder holder, int position) {
         Line item = linesFiltered.get(position);
+        holder.itemView.setTag(item);
+        holder.itemView.setOnLongClickListener(onItemLongClickListener);
         String text = item.getContent();
         if (!TextUtils.isEmpty(lowerKeyword) || !TextUtils.isEmpty(lowerSearchWord)) {
             SpannableString spannableText = new SpannableString(text);
@@ -191,6 +200,63 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     @Override
     public int getItemCount() {
         return linesFiltered.size();
+    }
+
+    private final View.OnLongClickListener onItemLongClickListener = new View.OnLongClickListener() {
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (v.getTag() instanceof Line) {
+                final Line line = (Line) v.getTag();
+                final Context context = v.getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                String[] menuItems = new String[]{
+                        context.getString(R.string.copy_text),
+                        context.getString(R.string.pretty_json)
+                };
+                builder.setItems(menuItems, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            setClipboardText(context, line.getContent());
+                        } else {
+                            showPrettyJsonDialog(context, line.getContent());
+                        }
+                    }
+                });
+                builder.show();
+                return true;
+            }
+            return false;
+        }
+    };
+
+    private void setClipboardText(Context context, String text) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("label", text);
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(context, R.string.done, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showPrettyJsonDialog(final Context context, String text) {
+        try {
+            int index = text.indexOf("{");
+            JSONObject jsonObject = new JSONObject(text.substring(index));
+            final String jsonString = jsonObject.toString(2);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(jsonString);
+            builder.setNegativeButton(R.string.copy_text, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    setClipboardText(context, jsonString);
+                }
+            });
+            builder.setPositiveButton(R.string.warning_close, null);
+            builder.show();
+        } catch (Exception ex) {
+            Toast.makeText(context, R.string.not_json_string, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

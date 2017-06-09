@@ -19,4 +19,8 @@
     <string name="menu_more">More menu</string>
     <string name="hint_filter_by_keyword">Filter by keyword</string>
     <string name="hint_highlight_keyword">Highlight keyword</string>
+    <string name="done">Done</string>
+    <string name="copy_text">Copy text</string>
+    <string name="pretty_json">Pretty json</string>
+    <string name="not_json_string">Not json string</string>
 </resources>

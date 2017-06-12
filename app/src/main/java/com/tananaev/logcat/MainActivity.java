@@ -229,11 +229,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_filter:
                 showFilterDialog();
                 break;
-            case R.id.action_delete:
+            case R.id.action_delete_all:
                 AlertDialog dialog = new AlertDialog.Builder(this)
                         .setMessage(R.string.clear_log_confirm)
-                        .setNegativeButton(R.string.cancel, null)
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setPositiveButton(R.string.menu_delete_all, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 adapter.clear();

@@ -43,15 +43,10 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     private List<Line> linesAll = new LinkedList<>();
     private List<Line> linesFiltered = new LinkedList<>();
 
-    @NonNull
     private String tag = "";
-    @NonNull
     private String keyword = "";
-    @NonNull
     private String lowerKeyword = "";
-    @NonNull
     private String searchWord = "";
-    @NonNull
     private String lowerSearchWord = "";
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
@@ -121,7 +116,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         return linesFiltered;
     }
 
-    public void filter(@NonNull String tag, @NonNull String keyword) {
+    public void filter(String tag, String keyword) {
         this.tag = tag;
         this.keyword = keyword;
         this.lowerKeyword = keyword.toLowerCase();
@@ -130,7 +125,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         notifyDataSetChanged();
     }
 
-    public void search(@NonNull String searchWord) {
+    public void search(String searchWord) {
         this.searchWord = searchWord;
         this.lowerSearchWord = searchWord.toLowerCase();
         notifyDataSetChanged();

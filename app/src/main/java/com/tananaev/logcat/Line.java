@@ -51,9 +51,6 @@ public class Line {
 
     @NonNull
     public String getLowerTag() {
-        if (lowerTag == null) {
-            return "";
-        }
         return lowerTag;
     }
 

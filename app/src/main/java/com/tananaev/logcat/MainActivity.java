@@ -19,7 +19,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -230,17 +229,7 @@ public class MainActivity extends AppCompatActivity {
                 showFilterDialog();
                 break;
             case R.id.action_delete_all:
-                AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setMessage(R.string.clear_log_confirm)
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .setPositiveButton(R.string.menu_delete_all, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                adapter.clear();
-                            }
-                        })
-                        .show();
-                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+                adapter.clear();
                 break;
             case R.id.action_search:
                 showSearchDialog();

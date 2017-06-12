@@ -12,7 +12,6 @@
     <string name="warning_more">More info</string>
     <string name="warning_text">For this app to work, you need to enable remote debugging on the phone using following adb command:\n\nadb tcpip 5555</string>
     <string name="hint_filter_by_tag">Filter by tag</string>
-    <string name="clear_log_confirm">Delete all log?</string>
     <string name="menu_delete_all">Delete all</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_more">More menu</string>

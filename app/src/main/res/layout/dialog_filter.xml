@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_close_circle_grey600_24dp" />
+            android:src="@drawable/ic_close_circle_grey_24dp" />
 
     </LinearLayout>
 
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_close_circle_grey600_24dp" />
+            android:src="@drawable/ic_close_circle_grey_24dp" />
 
     </LinearLayout>
 

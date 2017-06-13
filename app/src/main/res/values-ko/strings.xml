@@ -18,8 +18,8 @@
     <string name="menu_more">더 보기</string>
     <string name="hint_filter_by_keyword">키워드로 필터</string>
     <string name="hint_highlight_keyword">키워드 하이라이트</string>
-    <string name="done">완료</string>
-    <string name="copy_text">텍스트 복사</string>
-    <string name="pretty_json">예쁜 JSON</string>
-    <string name="not_json_string">JSON 문자열이 아닙니다.</string>
+    <string name="message_done">완료</string>
+    <string name="menu_copy_text">텍스트 복사</string>
+    <string name="menu_pretty_json">예쁜 JSON</string>
+    <string name="message_not_json_string">JSON 문자열이 아닙니다.</string>
 </resources>

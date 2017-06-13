@@ -206,8 +206,8 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
                 final Context context = v.getContext();
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 String[] menuItems = new String[]{
-                        context.getString(R.string.copy_text),
-                        context.getString(R.string.pretty_json)
+                        context.getString(R.string.menu_copy_text),
+                        context.getString(R.string.menu_pretty_json)
                 };
                 builder.setItems(menuItems, new DialogInterface.OnClickListener() {
                     @Override
@@ -231,7 +231,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         ClipData clip = ClipData.newPlainText("label", text);
         clipboard.setPrimaryClip(clip);
 
-        Toast.makeText(context, R.string.done, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, R.string.message_done, Toast.LENGTH_SHORT).show();
     }
 
     private void showPrettyJsonDialog(final Context context, String text) {
@@ -241,7 +241,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             final String jsonString = jsonObject.toString(2);
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(jsonString);
-            builder.setNegativeButton(R.string.copy_text, new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.menu_copy_text, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     setClipboardText(context, jsonString);
@@ -250,7 +250,7 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             builder.setPositiveButton(R.string.warning_close, null);
             builder.show();
         } catch (Exception ex) {
-            Toast.makeText(context, R.string.not_json_string, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.message_not_json_string, Toast.LENGTH_SHORT).show();
         }
     }
 

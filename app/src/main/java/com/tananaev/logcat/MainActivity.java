@@ -144,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
     private void updateScrollState(boolean scroll) {
         this.scroll = scroll;
         if (scroll) {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom_white_24dp);
+            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom);
             recyclerView.scrollToPosition(adapter.getItemCount() - 1);
         } else {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_center_white_24dp);
+            scrollItem.setIcon(R.drawable.ic_vertical_align_center);
         }
     }
 

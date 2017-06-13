@@ -10,34 +10,34 @@
 
     <item
         android:id="@+id/action_reconnect"
-        android:icon="@drawable/ic_sync_white_24dp"
+        android:icon="@drawable/ic_sync"
         android:title="@string/menu_reconnect"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_filter"
-        android:icon="@drawable/ic_filter_white_18dp"
+        android:icon="@drawable/ic_filter"
         android:title="@string/menu_filter"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/ic_search_white_24dp"
+        android:icon="@drawable/ic_search"
         android:title="@string/menu_search"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_scroll"
-        android:icon="@drawable/ic_vertical_align_bottom_white_24dp"
+        android:icon="@drawable/ic_vertical_align_bottom"
         android:title="@string/menu_scroll"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_more"
-        android:icon="@drawable/ic_dots_white_24dp"
+        android:icon="@drawable/ic_dots"
         android:title="@string/menu_more"
         android:visible="false"
         app:showAsAction="always">
@@ -45,13 +45,13 @@
 
             <item
                 android:id="@+id/action_share"
-                android:icon="@drawable/ic_share_grey_24dp"
+                android:icon="@drawable/ic_share"
                 android:title="@string/menu_share"
                 app:showAsAction="always" />
 
             <item
                 android:id="@+id/action_delete_all"
-                android:icon="@drawable/ic_delete_grey_24dp"
+                android:icon="@drawable/ic_delete"
                 android:title="@string/menu_delete_all"
                 app:showAsAction="always" />
         </menu>

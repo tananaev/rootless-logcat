@@ -37,7 +37,7 @@
 
     <item
         android:id="@+id/action_more"
-        android:icon="@drawable/ic_dots_vertical_white_24dp"
+        android:icon="@drawable/ic_dots_white_24dp"
         android:title="@string/menu_more"
         android:visible="false"
         app:showAsAction="always">

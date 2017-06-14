@@ -92,18 +92,17 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     private List<Line> filter(List<Line> lines) {
         List<Line> linesFiltered = new LinkedList<>();
-        String lowerTag = tag != null ? tag.toLowerCase() : null;
-        String lowerKeyword = keyword != null ? keyword.toLowerCase() : null;
-        boolean hasKeyword = !TextUtils.isEmpty(lowerKeyword);
-        boolean hasTag = !TextUtils.isEmpty(lowerTag);
+        boolean hasKeyword = !TextUtils.isEmpty(keyword);
+        boolean hasTag = !TextUtils.isEmpty(tag);
         if (hasKeyword || hasTag) {
             for (Line line : lines) {
-                String lowerContent = line.getContent().toLowerCase();
-                if (hasTag && hasKeyword && line.containsTag(lowerTag) && lowerContent.contains(lowerKeyword)) {
+                if (hasTag && hasKeyword
+                        && StringUtils.containsIgnoreCase(line.getTag(), tag)
+                        && StringUtils.containsIgnoreCase(line.getContent(), keyword)) {
                     linesFiltered.add(line);
-                } else if (hasTag && !hasKeyword && line.containsTag(lowerTag)) {
+                } else if (hasTag && !hasKeyword && StringUtils.containsIgnoreCase(line.getTag(), tag)) {
                     linesFiltered.add(line);
-                } else if (!hasTag && hasKeyword && lowerContent.contains(lowerKeyword)) {
+                } else if (!hasTag && hasKeyword && StringUtils.containsIgnoreCase(line.getContent(), keyword)) {
                     linesFiltered.add(line);
                 }
             }
@@ -146,26 +145,24 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         String text = item.getContent();
         Context context = holder.getTextView().getContext();
         if (!TextUtils.isEmpty(keyword) || !TextUtils.isEmpty(searchWord)) {
-            String lowerKeyword = keyword != null ? keyword.toLowerCase() : null;
-            String lowerSearchWord = searchWord != null ? searchWord.toLowerCase() : null;
-            String lowerContent = item.getContent().toLowerCase();
+            String content = item.getContent();
             SpannableString spannableText = new SpannableString(text);
 
-            if (!TextUtils.isEmpty(lowerKeyword)) {
+            if (!TextUtils.isEmpty(keyword)) {
                 int index = 0, found;
                 int filteredKeywordBackgroundColor = context.getResources().getColor(R.color.filtered_keyword_background);
-                while ((found = lowerContent.indexOf(lowerKeyword, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(filteredKeywordBackgroundColor), found, found + lowerKeyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    index = found + lowerKeyword.length();
+                while ((found = StringUtils.indexOfIgnoreCase(content, keyword, index)) >= 0) {
+                    spannableText.setSpan(new BackgroundColorSpan(filteredKeywordBackgroundColor), found, found + keyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    index = found + keyword.length();
                 }
             }
 
-            if (!TextUtils.isEmpty(lowerSearchWord)) {
+            if (!TextUtils.isEmpty(searchWord)) {
                 int index = 0, found;
                 int searchWordBackgroundColor = context.getResources().getColor(R.color.search_word_background);
-                while ((found = lowerContent.indexOf(lowerSearchWord, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(searchWordBackgroundColor), found, found + lowerSearchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    index = found + lowerSearchWord.length();
+                while ((found = StringUtils.indexOfIgnoreCase(content, searchWord, index)) >= 0) {
+                    spannableText.setSpan(new BackgroundColorSpan(searchWordBackgroundColor), found, found + searchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    index = found + searchWord.length();
                 }
             }
             holder.getTextView().setText(spannableText);

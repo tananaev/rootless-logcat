@@ -25,7 +25,7 @@ public class Line {
     private static Pattern linePattern = Pattern.compile("\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d (\\w)/(\\w+).*");
 
     private char level = 'D';
-    private String lowerTag;
+    private String tag;
     @NonNull
     private final String content;
 
@@ -34,7 +34,7 @@ public class Line {
         Matcher matcher = linePattern.matcher(content);
         if (matcher.matches()) {
             level = matcher.group(1).charAt(0);
-            lowerTag = matcher.group(2).toString().trim().toLowerCase();
+            tag = matcher.group(2).toString().trim();
         }
     }
 
@@ -42,8 +42,8 @@ public class Line {
         return level;
     }
 
-    public boolean containsTag(String tag) {
-        return lowerTag != null && lowerTag.contains(tag);
+    public String getTag() {
+        return tag;
     }
 
     public String getContent() {

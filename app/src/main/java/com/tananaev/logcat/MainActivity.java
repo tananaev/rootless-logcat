@@ -15,6 +15,7 @@
  */
 package com.tananaev.logcat;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,12 +31,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
+
+import com.tananaev.logcat.view.FilterOptionsViewController;
+import com.tananaev.logcat.view.SearchOptionsViewController;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -73,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem statusItem;
     private MenuItem reconnectItem;
     private MenuItem scrollItem;
-    private MenuItem shareItem;
+    private MenuItem filterItem;
     private MenuItem searchItem;
+    private MenuItem moreMenuItem;
 
     private boolean scroll = true;
 
@@ -141,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
     private void updateScrollState(boolean scroll) {
         this.scroll = scroll;
         if (scroll) {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom_white_24dp);
+            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom);
             recyclerView.scrollToPosition(adapter.getItemCount() - 1);
         } else {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_center_white_24dp);
+            scrollItem.setIcon(R.drawable.ic_vertical_align_center);
         }
     }
 
@@ -167,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         if (file.exists()) {
             file.delete();
         }
-        try  {
+        try {
             file.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             for (Line line : adapter.getLines()) {
@@ -194,8 +197,9 @@ public class MainActivity extends AppCompatActivity {
         statusItem = menu.findItem(R.id.view_status);
         reconnectItem = menu.findItem(R.id.action_reconnect);
         scrollItem = menu.findItem(R.id.action_scroll);
-        shareItem = menu.findItem(R.id.action_share);
+        filterItem = menu.findItem(R.id.action_filter);
         searchItem = menu.findItem(R.id.action_search);
+        moreMenuItem = menu.findItem(R.id.action_more);
 
         restartReader();
 
@@ -211,34 +215,46 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_reconnect) {
-            restartReader();
-            return true;
-        } else if (item.getItemId() == R.id.action_scroll) {
-            updateScrollState(!scroll);
-            return true;
-        } else if (item.getItemId() == R.id.action_share) {
-            startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
-            return true;
-        } else if (item.getItemId() == R.id.action_search) {
-            showSearchDialog();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_reconnect:
+                restartReader();
+                break;
+            case R.id.action_scroll:
+                updateScrollState(!scroll);
+                break;
+            case R.id.action_share:
+                startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
+                break;
+            case R.id.action_filter:
+                showFilterDialog();
+                break;
+            case R.id.action_delete_all:
+                adapter.clear();
+                break;
+            case R.id.action_search:
+                showSearchDialog();
+                break;
+            default:
+                return false;
         }
-        return false;
+        return true;
     }
 
-    private void showSearchDialog() {
+    private void showFilterDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_search, null);
-        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
-        builder.setView(viewInflated);
+        final FilterOptionsViewController filterOptionsViewController = new FilterOptionsViewController(this);
+        filterOptionsViewController.setTag(adapter.getTag());
+        filterOptionsViewController.setKeyword(adapter.getKeyword());
+        builder.setView(filterOptionsViewController.getBaseView());
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                adapter.filter(input.getText().toString());
+                String tag = filterOptionsViewController.getTag();
+                String keyword = filterOptionsViewController.getKeyword();
+                adapter.filter(tag, keyword);
+                filterOptionsViewController.saveTagKeyword(tag, keyword);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -248,7 +264,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        builder.show();
+        Dialog dialog = builder.create();
+        dialog.getWindow().setGravity(Gravity.TOP);
+        dialog.show();
+    }
+
+    private void showSearchDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        final SearchOptionsViewController searchOptionsViewController = new SearchOptionsViewController(this);
+        searchOptionsViewController.setSearchWord(adapter.getSearchWord());
+        builder.setView(searchOptionsViewController.getBaseView());
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String searchWord = searchOptionsViewController.getSearchWord();
+                adapter.search(searchWord);
+                searchOptionsViewController.saveSearchWord(searchWord);
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        Dialog dialog = builder.create();
+        dialog.getWindow().setGravity(Gravity.TOP);
+        dialog.show();
     }
 
     private KeyPair getKeyPair() throws GeneralSecurityException, IOException {
@@ -311,8 +356,9 @@ public class MainActivity extends AppCompatActivity {
                     statusItem.setTitle(statusUpdate.getStatusMessage());
                     reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
                     scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    shareItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    filterItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                     searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+                    moreMenuItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
                 }
                 if (statusUpdate.getLines() != null) {
                     adapter.addItems(statusUpdate.getLines());

@@ -5,6 +5,11 @@
     <string name="menu_scroll">Scroll</string>
     <string name="menu_share">Share</string>
     <string name="menu_search">Search</string>
+    <string name="menu_delete_all">Delete all</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_more">More menu</string>
+    <string name="menu_copy_text">Copy text</string>
+    <string name="menu_pretty_json">Pretty json</string>
     <string name="status_connecting">Connecting…</string>
     <string name="status_opening">Opening…</string>
     <string name="status_active">Active</string>
@@ -12,13 +17,8 @@
     <string name="warning_more">More info</string>
     <string name="warning_text">For this app to work, you need to enable remote debugging on the phone using following adb command:\n\nadb tcpip 5555</string>
     <string name="hint_filter_by_tag">Filter by tag</string>
-    <string name="menu_delete_all">Delete all</string>
-    <string name="menu_filter">Filter</string>
-    <string name="menu_more">More menu</string>
     <string name="hint_filter_by_keyword">Filter by keyword</string>
     <string name="hint_highlight_keyword">Highlight keyword</string>
     <string name="message_done">Done</string>
-    <string name="menu_copy_text">Copy text</string>
-    <string name="menu_pretty_json">Pretty json</string>
     <string name="message_not_json_string">Not json string</string>
 </resources>

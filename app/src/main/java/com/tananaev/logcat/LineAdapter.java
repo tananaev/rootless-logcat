@@ -19,8 +19,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -33,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
@@ -43,11 +42,9 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     private List<Line> linesAll = new LinkedList<>();
     private List<Line> linesFiltered = new LinkedList<>();
 
-    private String tag = "";
-    private String keyword = "";
-    private String lowerKeyword = "";
-    private String searchWord = "";
-    private String lowerSearchWord = "";
+    private String tag;
+    private String keyword;
+    private String searchWord;
 
     public static class LineViewHolder extends RecyclerView.ViewHolder {
 
@@ -68,12 +65,10 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         return linesFiltered;
     }
 
-    @NonNull
     public String getKeyword() {
         return keyword;
     }
 
-    @NonNull
     public String getTag() {
         return tag;
     }
@@ -97,16 +92,18 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     private List<Line> filter(List<Line> lines) {
         List<Line> linesFiltered = new LinkedList<>();
-        String lowerTag = tag.toLowerCase();
+        String lowerTag = tag != null ? tag.toLowerCase() : null;
+        String lowerKeyword = keyword != null ? keyword.toLowerCase() : null;
         boolean hasKeyword = !TextUtils.isEmpty(lowerKeyword);
         boolean hasTag = !TextUtils.isEmpty(lowerTag);
         if (hasKeyword || hasTag) {
             for (Line line : lines) {
-                if (hasTag && hasKeyword && line.getLowerTag().contains(lowerTag) && line.getLowerContent().contains(lowerKeyword)) {
+                String lowerContent = line.getContent().toLowerCase();
+                if (hasTag && hasKeyword && line.containsTag(lowerTag) && lowerContent.contains(lowerKeyword)) {
                     linesFiltered.add(line);
-                } else if (hasTag && !hasKeyword && line.getLowerTag().contains(lowerTag)) {
+                } else if (hasTag && !hasKeyword && line.containsTag(lowerTag)) {
                     linesFiltered.add(line);
-                } else if (!hasTag && hasKeyword && line.getLowerContent().contains(lowerKeyword)) {
+                } else if (!hasTag && hasKeyword && lowerContent.contains(lowerKeyword)) {
                     linesFiltered.add(line);
                 }
             }
@@ -119,7 +116,6 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
     public void filter(String tag, String keyword) {
         this.tag = tag;
         this.keyword = keyword;
-        this.lowerKeyword = keyword.toLowerCase();
 
         linesFiltered = filter(linesAll);
         notifyDataSetChanged();
@@ -127,7 +123,6 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
 
     public void search(String searchWord) {
         this.searchWord = searchWord;
-        this.lowerSearchWord = searchWord.toLowerCase();
         notifyDataSetChanged();
     }
 
@@ -149,25 +144,27 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         holder.itemView.setTag(item);
         holder.itemView.setOnLongClickListener(onItemLongClickListener);
         String text = item.getContent();
-        if (!TextUtils.isEmpty(lowerKeyword) || !TextUtils.isEmpty(lowerSearchWord)) {
+        Context context = holder.getTextView().getContext();
+        if (!TextUtils.isEmpty(keyword) || !TextUtils.isEmpty(searchWord)) {
+            String lowerKeyword = keyword != null ? keyword.toLowerCase() : null;
+            String lowerSearchWord = searchWord != null ? searchWord.toLowerCase() : null;
+            String lowerContent = item.getContent().toLowerCase();
             SpannableString spannableText = new SpannableString(text);
-            String lowerContent = item.getLowerContent();
 
-            // filter keyword
             if (!TextUtils.isEmpty(lowerKeyword)) {
-
                 int index = 0, found;
+                int filteredKeywordBackgroundColor = context.getResources().getColor(R.color.filtered_keyword_background);
                 while ((found = lowerContent.indexOf(lowerKeyword, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(Color.RED), found, found + lowerKeyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableText.setSpan(new BackgroundColorSpan(filteredKeywordBackgroundColor), found, found + lowerKeyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     index = found + lowerKeyword.length();
                 }
             }
 
-            // highlight search word
             if (!TextUtils.isEmpty(lowerSearchWord)) {
                 int index = 0, found;
+                int searchWordBackgroundColor = context.getResources().getColor(R.color.search_word_background);
                 while ((found = lowerContent.indexOf(lowerSearchWord, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(Color.YELLOW), found, found + lowerSearchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableText.setSpan(new BackgroundColorSpan(searchWordBackgroundColor), found, found + lowerSearchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     index = found + lowerSearchWord.length();
                 }
             }
@@ -176,7 +173,6 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             holder.getTextView().setText(text);
         }
 
-        Context context = holder.getTextView().getContext();
         holder.itemView.setBackgroundColor(context.getResources().getColor(position % 2 == 0 ? R.color.row_bg_color_even : R.color.row_bg_color_odd));
         switch (item.getLevel()) {
             case 'W':
@@ -249,7 +245,9 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
             });
             builder.setPositiveButton(R.string.warning_close, null);
             builder.show();
-        } catch (Exception ex) {
+        } catch (IndexOutOfBoundsException ex) {
+            Toast.makeText(context, R.string.message_not_json_string, Toast.LENGTH_SHORT).show();
+        } catch (JSONException ex) {
             Toast.makeText(context, R.string.message_not_json_string, Toast.LENGTH_SHORT).show();
         }
     }

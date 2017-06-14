@@ -8,4 +8,6 @@
     <color name="colorError">#7f0000</color>
     <color name="row_bg_color_odd">@android:color/white</color>
     <color name="row_bg_color_even">#eee</color>
+    <color name="filtered_keyword_background">#FF0000</color>
+    <color name="search_word_background">#FFFF00</color>
 </resources>

@@ -8,7 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
 public abstract class ViewUtils {
-    
+
+    private static final int AUTOCOMPLETE_DROPDOWN_DELAY = 100;
+
     public static void setAutoCompleteTextViewAdapter(Context context, final AutoCompleteTextView autoCompleteTextView, String[] history) {
 
         ArrayAdapter<String> tagAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, history);
@@ -49,7 +51,7 @@ public abstract class ViewUtils {
                         public void run() {
                             autoCompleteTextView.showDropDown();
                         }
-                    }, 100);
+                    }, AUTOCOMPLETE_DROPDOWN_DELAY);
                 }
             }
         });

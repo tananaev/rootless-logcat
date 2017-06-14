@@ -6,6 +6,11 @@
     <string name="menu_scroll">스크롤</string>
     <string name="menu_share">공유</string>
     <string name="menu_search">검색</string>
+    <string name="menu_delete_all">모두 삭제</string>
+    <string name="menu_filter">필터</string>
+    <string name="menu_more">더 보기</string>
+    <string name="menu_copy_text">텍스트 복사</string>
+    <string name="menu_pretty_json">예쁜 JSON</string>
     <string name="status_connecting">연결중…</string>
     <string name="status_opening">여는중…</string>
     <string name="status_active">연결됨</string>
@@ -13,13 +18,8 @@
     <string name="warning_more">추가 정보</string>
     <string name="warning_text">이 앱을 정상적으로 사용하기 위해서 아래의 ADB 명령어를 실행해야 합니다.\n\nadb tcpip 5555</string>
     <string name="hint_filter_by_tag">태그로 필터</string>
-    <string name="menu_delete_all">모두 삭제</string>
-    <string name="menu_filter">필터</string>
-    <string name="menu_more">더 보기</string>
     <string name="hint_filter_by_keyword">키워드로 필터</string>
     <string name="hint_highlight_keyword">키워드 하이라이트</string>
     <string name="message_done">완료</string>
-    <string name="menu_copy_text">텍스트 복사</string>
-    <string name="menu_pretty_json">예쁜 JSON</string>
     <string name="message_not_json_string">JSON 문자열이 아닙니다.</string>
 </resources>

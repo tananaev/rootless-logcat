@@ -257,12 +257,7 @@ public class MainActivity extends AppCompatActivity {
                 filterOptionsViewController.saveTagKeyword(tag, keyword);
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(android.R.string.cancel, null);
 
         Dialog dialog = builder.create();
         dialog.getWindow().setGravity(Gravity.TOP);
@@ -284,12 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 searchOptionsViewController.saveSearchWord(searchWord);
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+        builder.setNegativeButton(android.R.string.cancel, null);
 
         Dialog dialog = builder.create();
         dialog.getWindow().setGravity(Gravity.TOP);

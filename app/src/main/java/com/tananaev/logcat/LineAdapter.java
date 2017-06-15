@@ -96,15 +96,13 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         boolean hasTag = !TextUtils.isEmpty(tag);
         if (hasKeyword || hasTag) {
             for (Line line : lines) {
-                if (hasTag && hasKeyword
-                        && StringUtils.containsIgnoreCase(line.getTag(), tag)
-                        && StringUtils.containsIgnoreCase(line.getContent(), keyword)) {
-                    linesFiltered.add(line);
-                } else if (hasTag && !hasKeyword && StringUtils.containsIgnoreCase(line.getTag(), tag)) {
-                    linesFiltered.add(line);
-                } else if (!hasTag && hasKeyword && StringUtils.containsIgnoreCase(line.getContent(), keyword)) {
-                    linesFiltered.add(line);
+                if (hasTag && !StringUtils.containsIgnoreCase(line.getTag(), tag)) {
+                    continue;
                 }
+                if (hasKeyword && !StringUtils.containsIgnoreCase(line.getContent(), keyword)) {
+                    continue;
+                }
+                linesFiltered.add(line);
             }
         } else {
             linesFiltered.addAll(lines);
@@ -142,17 +140,16 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         Line item = linesFiltered.get(position);
         holder.itemView.setTag(item);
         holder.itemView.setOnLongClickListener(onItemLongClickListener);
-        String text = item.getContent();
+        String content = item.getContent();
         Context context = holder.getTextView().getContext();
         if (!TextUtils.isEmpty(keyword) || !TextUtils.isEmpty(searchWord)) {
-            String content = item.getContent();
-            SpannableString spannableText = new SpannableString(text);
+            SpannableString spannableContent = new SpannableString(content);
 
             if (!TextUtils.isEmpty(keyword)) {
                 int index = 0, found;
                 int filteredKeywordBackgroundColor = context.getResources().getColor(R.color.filtered_keyword_background);
                 while ((found = StringUtils.indexOfIgnoreCase(content, keyword, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(filteredKeywordBackgroundColor), found, found + keyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableContent.setSpan(new BackgroundColorSpan(filteredKeywordBackgroundColor), found, found + keyword.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     index = found + keyword.length();
                 }
             }
@@ -161,13 +158,13 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
                 int index = 0, found;
                 int searchWordBackgroundColor = context.getResources().getColor(R.color.search_word_background);
                 while ((found = StringUtils.indexOfIgnoreCase(content, searchWord, index)) >= 0) {
-                    spannableText.setSpan(new BackgroundColorSpan(searchWordBackgroundColor), found, found + searchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    spannableContent.setSpan(new BackgroundColorSpan(searchWordBackgroundColor), found, found + searchWord.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     index = found + searchWord.length();
                 }
             }
-            holder.getTextView().setText(spannableText);
+            holder.getTextView().setText(spannableContent);
         } else {
-            holder.getTextView().setText(text);
+            holder.getTextView().setText(content);
         }
 
         holder.itemView.setBackgroundColor(context.getResources().getColor(position % 2 == 0 ? R.color.row_bg_color_even : R.color.row_bg_color_odd));

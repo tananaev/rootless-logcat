@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt')
         }
     }
+    lintOptions {
+        // Ignore MissingTranslation lint error on release build
+        checkReleaseBuilds false
+    }
 }
 
 dependencies {

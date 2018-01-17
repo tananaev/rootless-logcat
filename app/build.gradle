@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.tananaev.logcat"
         minSdkVersion 18
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 8
         versionName "1.7"
     }
@@ -18,14 +18,11 @@ android {
         }
     }
     lintOptions {
-        // Ignore MissingTranslation lint error on release build
-        checkReleaseBuilds false
+        checkReleaseBuilds false // ignore list warnings on release
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:design:27.0.2'
     compile 'com.tananaev:adblib:1.2'
 }

@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -182,11 +183,12 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, e);
         }
 
-        Uri uri = Uri.fromFile(new File(getExternalCacheDir() + TEMP_FILE));
+        Uri uri = FileProvider.getUriForFile(this, getPackageName(), file);
 
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
+        intent.setType("text/*");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         return intent;
     }
 

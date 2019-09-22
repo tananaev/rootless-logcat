@@ -15,7 +15,7 @@
  */
 package com.tananaev.logcat;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public abstract class StringUtils {
 

@@ -2,4 +2,5 @@
     <dimen name="space">2dp</dimen>
     <dimen name="margin">8dp</dimen>
     <dimen name="font">12sp</dimen>
+    <dimen name="fastscroll_handle_width">13dp</dimen>
 </resources>

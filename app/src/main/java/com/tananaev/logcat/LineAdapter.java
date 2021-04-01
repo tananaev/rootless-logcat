@@ -31,13 +31,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.l4digital.fastscroll.FastScroller;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> {
+public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder> implements FastScroller.SectionIndexer {
 
     private List<Line> linesAll = new LinkedList<>();
     private List<Line> linesFiltered = new LinkedList<>();
@@ -246,4 +248,8 @@ public class LineAdapter extends RecyclerView.Adapter<LineAdapter.LineViewHolder
         }
     }
 
+    @Override
+    public CharSequence getSectionText(int position) {
+        return Integer.toString(position);
+    }
 }

@@ -18,4 +18,5 @@ android {
 dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.tananaev:adblib:1.2'
+    implementation 'com.l4digital.fastscroll:fastscroll:2.0.1'
 }

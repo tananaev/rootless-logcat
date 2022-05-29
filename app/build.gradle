@@ -1,21 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId "com.tananaev.logcat"
         minSdkVersion 18
-        targetSdkVersion 29
-        versionCode 12
-        versionName "1.11"
+        targetSdkVersion 32
+        versionCode 13
+        versionName "1.12"
     }
-    lintOptions {
-        checkReleaseBuilds false // ignore list warnings on release
+    namespace "com.tananaev.logcat"
+    lint {
+        checkReleaseBuilds false
     }
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.6.0'
     implementation 'com.tananaev:adblib:1.2'
 }

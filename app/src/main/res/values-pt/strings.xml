@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Logcat</string>
+    <string name="app_name_short">Logs</string>
+    <string name="menu_reconnect">Reconectar</string>
+    <string name="menu_scroll">Percorrer</string>
+    <string name="menu_share">Compartilhar</string>
+    <string name="menu_search">Procurar</string>
+    <string name="menu_delete_all">Excluir tudo</string>
+    <string name="menu_filter">Filtrar</string>
+    <string name="menu_more">Mais menu</string>
+    <string name="menu_copy_text">Copiar texto</string>
+    <string name="menu_pretty_json">Belo json</string>
+    <string name="status_connecting">Conectando…</string>
+    <string name="status_opening">Abrindo…</string>
+    <string name="status_active">Ativo</string>
+    <string name="warning_close">Fechar</string>
+    <string name="warning_more">Mais detalhes</string>
+    <string name="warning_text">Para que este app funcione, você precisa ativar no telefone a depuração remota, execute no computador o seguinte comando adb:\n\nadb tcpip 5555</string>
+    <string name="hint_filter_by_tag">Filtrar por categorias</string>
+    <string name="hint_filter_by_keyword">Filtrar por palavra-chave</string>
+    <string name="hint_highlight_keyword">Destacar palavra-chave</string>
+    <string name="message_done">Concluído</string>
+    <string name="message_not_json_string">Não é json string</string>
+</resources>

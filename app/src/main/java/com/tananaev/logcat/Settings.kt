@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,96 +13,101 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.text.TextUtils;
+import android.content.Context
+import android.text.TextUtils
+import java.lang.StringBuilder
 
-public class Settings {
-    private static final String SETTINGS = "settings";
-    private static final int MAX_COUNT = 10;
-    private static final String KEY_TAG_HISTORY = "tagHistory";
-    private static final String KEY_KEYWORD_HISTORY = "keywordHistory";
-    private static final String KEY_SEARCH_HISTORY = "searchHistory";
+object Settings {
 
-    // for filtering
-    @NonNull
-    public static String[] getTagHistory(Context context) {
-        return getHistory(context, KEY_TAG_HISTORY);
-    }
+    private const val SETTINGS = "settings"
+    private const val MAX_COUNT = 10
+    private const val KEY_TAG_HISTORY = "tagHistory"
+    private const val KEY_KEYWORD_HISTORY = "keywordHistory"
+    private const val KEY_SEARCH_HISTORY = "searchHistory"
 
     // for filtering
-    @NonNull
-    public static String[] getKeywordHistory(Context context) {
-        return getHistory(context, KEY_KEYWORD_HISTORY);
+    @JvmStatic
+    fun getTagHistory(context: Context): Array<String> {
+        return getHistory(context, KEY_TAG_HISTORY)
     }
 
-    @NonNull
-    private static String[] getHistory(Context context, String key) {
-        SharedPreferences pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
-        String history = pref.getString(key, "");
-        if (TextUtils.isEmpty(history)) {
-            return new String[]{};
-        }
-        return history.split("\n");
+    // for filtering
+    @JvmStatic
+    fun getKeywordHistory(context: Context): Array<String> {
+        return getHistory(context, KEY_KEYWORD_HISTORY)
     }
 
-    public static void appendTagHistory(Context context, @NonNull String[] tagHistory, @NonNull String[] keywordHistory, String newTag, String newKeyword) {
-        String tagHistoryData = makeHistoryData(tagHistory, newTag);
-        String keywordHistoryData = makeHistoryData(keywordHistory, newKeyword);
+    private fun getHistory(context: Context, key: String): Array<String> {
+        val pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
+        val history = pref.getString(key, "")
+        return if (TextUtils.isEmpty(history)) {
+            arrayOf()
+        } else history!!.split("\n").toTypedArray()
+    }
+
+    @JvmStatic
+    fun appendTagHistory(
+        context: Context,
+        tagHistory: Array<String>,
+        keywordHistory: Array<String>,
+        newTag: String,
+        newKeyword: String,
+    ) {
+        val tagHistoryData = makeHistoryData(tagHistory, newTag)
+        val keywordHistoryData = makeHistoryData(keywordHistory, newKeyword)
         if (TextUtils.isEmpty(tagHistoryData) && TextUtils.isEmpty(keywordHistoryData)) {
-            return;
+            return
         }
-
-        SharedPreferences pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
+        val pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
+        val editor = pref.edit()
         if (!TextUtils.isEmpty(tagHistoryData)) {
-            editor.putString(KEY_TAG_HISTORY, tagHistoryData);
+            editor.putString(KEY_TAG_HISTORY, tagHistoryData)
         }
         if (!TextUtils.isEmpty(keywordHistoryData)) {
-            editor.putString(KEY_KEYWORD_HISTORY, keywordHistoryData);
+            editor.putString(KEY_KEYWORD_HISTORY, keywordHistoryData)
         }
-        editor.apply();
+        editor.apply()
     }
 
-    @Nullable
-    private static String makeHistoryData(String[] history, String data) {
+    private fun makeHistoryData(history: Array<String>, data: String): String? {
         if (TextUtils.isEmpty(data)) {
-            return null;
+            return null
         }
-        if (history.length > 0 && TextUtils.equals(history[0], data)) {
-            return null;
+        if (history.isNotEmpty() && TextUtils.equals(history[0], data)) {
+            return null
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(data);
-        for (int i = 0; i < history.length && i < MAX_COUNT; i++) {
+        val sb = StringBuilder()
+        sb.append(data)
+        var i = 0
+        while (i < history.size && i < MAX_COUNT) {
             if (TextUtils.equals(history[i], data)) {
-                continue;
+                i++
+                continue
             }
-            sb.append("\n").append(history[i]);
+            sb.append("\n").append(history[i])
+            i++
         }
-
-        return sb.toString();
+        return sb.toString()
     }
 
     // for highlighting
-    @NonNull
-    public static String[] getSearchHistory(Context context) {
-        return getHistory(context, KEY_SEARCH_HISTORY);
+    @JvmStatic
+    fun getSearchHistory(context: Context): Array<String> {
+        return getHistory(context, KEY_SEARCH_HISTORY)
     }
 
-    public static void appendSearchHistory(Context context, @NonNull String[] searchHistory, String newSearchWord) {
-        String searchHistoryData = makeHistoryData(searchHistory, newSearchWord);
+    @JvmStatic
+    fun appendSearchHistory(context: Context, searchHistory: Array<String>, newSearchWord: String) {
+        val searchHistoryData = makeHistoryData(searchHistory, newSearchWord)
         if (TextUtils.isEmpty(searchHistoryData)) {
-            return;
+            return
         }
-        SharedPreferences pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(KEY_SEARCH_HISTORY, searchHistoryData);
-        editor.apply();
+        val pref = context.getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
+        val editor = pref.edit()
+        editor.putString(KEY_SEARCH_HISTORY, searchHistoryData)
+        editor.apply()
     }
+
 }

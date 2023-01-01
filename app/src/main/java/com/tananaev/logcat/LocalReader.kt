@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,43 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import android.util.Log;
+import android.util.Log
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Collections;
+class LocalReader : Reader {
 
-public class LocalReader implements Reader {
-
-    private static final String TAG = RemoteReader.class.getSimpleName();
-
-    @Override
-    public void read(UpdateHandler updateHandler) {
-
+    override fun read(updateHandler: Reader.UpdateHandler) {
         try {
-
-            String[] command = new String[] { "logcat", "-v", "time" };
-
-            updateHandler.update(R.string.status_opening, null);
-
-            Process process = Runtime.getRuntime().exec(command);
-
-            BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
-
-            updateHandler.update(R.string.status_active, null);
-
-            while (!updateHandler.isCancelled()) {
-                updateHandler.update(0, Collections.singletonList(bufferedReader.readLine()));
+            val command = arrayOf("logcat", "-v", "time")
+            updateHandler.update(R.string.status_opening, null)
+            val process = Runtime.getRuntime().exec(command)
+            val bufferedReader = BufferedReader(
+                InputStreamReader(process.inputStream)
+            )
+            updateHandler.update(R.string.status_active, null)
+            while (!updateHandler.isCancelled) {
+                updateHandler.update(0, listOf(bufferedReader.readLine()))
             }
-
-        } catch (IOException e) {
-            Log.w(TAG, e);
+        } catch (e: IOException) {
+            Log.w(TAG, e)
         }
+    }
 
+    companion object {
+        private val TAG = RemoteReader::class.java.simpleName
     }
 
 }

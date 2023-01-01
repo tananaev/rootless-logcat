@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
+import android.app.AlertDialog
+import android.app.Dialog
+import android.os.Bundle
+import android.content.Intent
+import android.net.Uri
+import androidx.fragment.app.DialogFragment
 
-public class WarningFragment extends DialogFragment {
+class WarningFragment : DialogFragment() {
 
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.warning_text)
-                .setPositiveButton(R.string.warning_more, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse("https://github.com/tananaev/rootless-logcat/blob/master/README.md"));
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton(R.string.warning_close, null)
-                .create();
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(activity)
+            .setMessage(R.string.warning_text)
+            .setPositiveButton(R.string.warning_more) { _, _ ->
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse("https://github.com/tananaev/rootless-logcat/blob/master/README.md")
+                startActivity(intent)
+            }
+            .setNegativeButton(R.string.warning_close, null)
+            .create()
     }
 
 }

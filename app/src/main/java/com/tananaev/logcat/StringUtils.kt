@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,41 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import androidx.annotation.Nullable;
+object StringUtils {
 
-public abstract class StringUtils {
+    private const val INDEX_NOT_FOUND = -1
 
-    private static final int INDEX_NOT_FOUND = -1;
-
-    public static int indexOfIgnoreCase(@Nullable String str, @Nullable String searchStr) {
-        return indexOfIgnoreCase(str, searchStr, 0);
+    @JvmStatic
+    fun containsIgnoreCase(str: String?, searchStr: String?): Boolean {
+        return indexOfIgnoreCase(str, searchStr, 0) >= 0
     }
 
-    public static boolean containsIgnoreCase(@Nullable String str, @Nullable String searchStr) {
-        return indexOfIgnoreCase(str, searchStr, 0) >= 0;
-    }
-
-    public static int indexOfIgnoreCase(@Nullable String str, @Nullable String searchStr, int startPos) {
-        if (str == null || searchStr == null) {
-            return INDEX_NOT_FOUND;
+    @JvmStatic
+    fun indexOfIgnoreCase(str: String?, searchString: String?, startPosition: Int = 0): Int {
+        var startIndex = startPosition
+        if (str == null || searchString == null) {
+            return INDEX_NOT_FOUND
         }
-        if (startPos < 0) {
-            startPos = 0;
+        if (startIndex < 0) {
+            startIndex = 0
         }
-        final int endLimit = str.length() - searchStr.length() + 1;
-        if (startPos > endLimit) {
-            return INDEX_NOT_FOUND;
+        val endLimit = str.length - searchString.length + 1
+        if (startIndex > endLimit) {
+            return INDEX_NOT_FOUND
         }
-        if (searchStr.length() == 0) {
-            return startPos;
+        if (searchString.isEmpty()) {
+            return startIndex
         }
-        for (int i = startPos; i < endLimit; i++) {
-            if (str.regionMatches(true, i, searchStr, 0, searchStr.length())) {
-                return i;
+        for (i in startIndex until endLimit) {
+            if (str.regionMatches(i, searchString, 0, searchString.length, ignoreCase = true)) {
+                return i
             }
         }
-        return INDEX_NOT_FOUND;
+        return INDEX_NOT_FOUND
     }
+
 }

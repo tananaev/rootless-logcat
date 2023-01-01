@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,354 +13,296 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+@file:Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
 
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
-import android.util.Base64;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+package com.tananaev.logcat
 
-import com.tananaev.logcat.view.FilterOptionsViewController;
-import com.tananaev.logcat.view.SearchOptionsViewController;
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Intent
+import android.os.AsyncTask
+import android.os.Bundle
+import android.preference.PreferenceManager
+import android.util.Base64
+import android.util.Log
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
+import com.tananaev.logcat.view.FilterOptionsController
+import com.tananaev.logcat.view.SearchOptionsController
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
+import java.security.GeneralSecurityException
+import java.security.KeyFactory
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.List;
+class MainActivity : AppCompatActivity() {
 
-public class MainActivity extends AppCompatActivity {
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: LineAdapter
+    private lateinit var keyPair: KeyPair
+    private var readerTask: ReaderTask? = null
+    private var statusItem: MenuItem? = null
+    private var reconnectItem: MenuItem? = null
+    private var scrollItem: MenuItem? = null
+    private var filterItem: MenuItem? = null
+    private var searchItem: MenuItem? = null
+    private var moreMenuItem: MenuItem? = null
+    private var scroll = true
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private class StatusUpdate(
+        val statusMessage: Int,
+        val lines: List<String>?,
+    )
 
-    private static final String KEY_PUBLIC = "publicKey";
-    private static final String KEY_PRIVATE = "privateKey";
-
-    private static final String KEY_WARNING_SHOWN = "warningShown";
-
-    private static final String TEMP_FILE = "/logcat.txt";
-
-    private static final long ANIMATION_DURATION = 75;
-
-    private RecyclerView recyclerView;
-    private LineAdapter adapter;
-
-    private KeyPair keyPair;
-    private ReaderTask readerTask;
-
-    private MenuItem statusItem;
-    private MenuItem reconnectItem;
-    private MenuItem scrollItem;
-    private MenuItem filterItem;
-    private MenuItem searchItem;
-    private MenuItem moreMenuItem;
-
-    private boolean scroll = true;
-
-    private static class StatusUpdate {
-        private int statusMessage;
-        private List<String> lines;
-
-        public StatusUpdate(int statusMessage, List<String> lines) {
-            this.statusMessage = statusMessage;
-            this.lines = lines;
-        }
-
-        public int getStatusMessage() {
-            return statusMessage;
-        }
-
-        public List<String> getLines() {
-            return lines;
-        }
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        recyclerView = (RecyclerView) findViewById(android.R.id.list);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        SimpleItemAnimator animator = new DefaultItemAnimator();
-        animator.setMoveDuration(ANIMATION_DURATION);
-        animator.setAddDuration(ANIMATION_DURATION);
-        animator.setChangeDuration(ANIMATION_DURATION);
-        animator.setRemoveDuration(ANIMATION_DURATION);
-        recyclerView.setItemAnimator(animator);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        recyclerView = findViewById<View>(android.R.id.list) as RecyclerView
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
+        val animator: SimpleItemAnimator = DefaultItemAnimator()
+        animator.moveDuration = ANIMATION_DURATION
+        animator.addDuration = ANIMATION_DURATION
+        animator.changeDuration = ANIMATION_DURATION
+        animator.removeDuration = ANIMATION_DURATION
+        recyclerView.itemAnimator = animator
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    updateScrollState(false);
+                    updateScrollState(false)
                 }
             }
-        });
-
-        adapter = new LineAdapter();
-        recyclerView.setAdapter(adapter);
-
+        })
+        adapter = LineAdapter()
+        recyclerView.adapter = adapter
         try {
-            keyPair = getKeyPair(); // crashes on non-main thread
-        } catch (GeneralSecurityException | IOException e) {
-            Log.w(TAG, e);
+            keyPair = getKeyPair() // crashes on non-main thread
+        } catch (e: GeneralSecurityException) {
+            Log.w(TAG, e)
+        } catch (e: IOException) {
+            Log.w(TAG, e)
         }
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         if (!preferences.getBoolean(KEY_WARNING_SHOWN, false)) {
-            new WarningFragment().show(getFragmentManager(), null);
-            preferences.edit().putBoolean(KEY_WARNING_SHOWN, true).apply();
+            WarningFragment().show(supportFragmentManager, null)
+            preferences.edit().putBoolean(KEY_WARNING_SHOWN, true).apply()
         }
     }
 
-    private void updateScrollState(boolean scroll) {
-        this.scroll = scroll;
+    private fun updateScrollState(scroll: Boolean) {
+        this.scroll = scroll
         if (scroll) {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_bottom);
-            recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+            scrollItem!!.setIcon(R.drawable.ic_vertical_align_bottom)
+            recyclerView.scrollToPosition(adapter.itemCount - 1)
         } else {
-            scrollItem.setIcon(R.drawable.ic_vertical_align_center);
+            scrollItem!!.setIcon(R.drawable.ic_vertical_align_center)
         }
     }
 
-    private void stopReader() {
-        adapter.clear();
+    private fun stopReader() {
+        adapter.clear()
         if (readerTask != null) {
-            readerTask.cancel(true);
-            readerTask = null;
+            readerTask!!.cancel(true)
+            readerTask = null
         }
     }
 
-    private void restartReader() {
-        stopReader();
-        readerTask = new ReaderTask();
-        readerTask.execute();
+    private fun restartReader() {
+        stopReader()
+        readerTask = ReaderTask()
+        readerTask!!.execute()
     }
 
-    private Intent getShareIntent() {
-        File file = new File(getExternalCacheDir() + TEMP_FILE);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            for (Line line : adapter.getLines()) {
-                writer.write(line.getContent());
-                writer.newLine();
+    private val shareIntent: Intent
+        get() {
+            val file = File(externalCacheDir.toString() + TEMP_FILE)
+            if (file.exists()) {
+                file.delete()
             }
-            writer.close();
-        } catch (IOException e) {
-            Log.w(TAG, e);
+            try {
+                file.createNewFile()
+                val writer = BufferedWriter(FileWriter(file))
+                for (line in adapter.lines) {
+                    writer.write(line.content)
+                    writer.newLine()
+                }
+                writer.close()
+            } catch (e: IOException) {
+                Log.w(TAG, e)
+            }
+            val uri = FileProvider.getUriForFile(this, packageName, file)
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/*"
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            return intent
         }
 
-        Uri uri = FileProvider.getUriForFile(this, getPackageName(), file);
-
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/*");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        return intent;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main, menu)
+        statusItem = menu.findItem(R.id.view_status)
+        reconnectItem = menu.findItem(R.id.action_reconnect)
+        scrollItem = menu.findItem(R.id.action_scroll)
+        filterItem = menu.findItem(R.id.action_filter)
+        searchItem = menu.findItem(R.id.action_search)
+        moreMenuItem = menu.findItem(R.id.action_more)
+        restartReader()
+        return true
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        statusItem = menu.findItem(R.id.view_status);
-        reconnectItem = menu.findItem(R.id.action_reconnect);
-        scrollItem = menu.findItem(R.id.action_scroll);
-        filterItem = menu.findItem(R.id.action_filter);
-        searchItem = menu.findItem(R.id.action_search);
-        moreMenuItem = menu.findItem(R.id.action_more);
-
-        restartReader();
-
-        return true;
+    override fun onDestroy() {
+        super.onDestroy()
+        stopReader()
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        stopReader();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_reconnect:
-                restartReader();
-                break;
-            case R.id.action_scroll:
-                updateScrollState(!scroll);
-                break;
-            case R.id.action_share:
-                startActivity(Intent.createChooser(getShareIntent(), getString(R.string.menu_share)));
-                break;
-            case R.id.action_filter:
-                showFilterDialog();
-                break;
-            case R.id.action_delete_all:
-                adapter.clear();
-                break;
-            case R.id.action_search:
-                showSearchDialog();
-                break;
-            default:
-                return false;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_reconnect -> restartReader()
+            R.id.action_scroll -> updateScrollState(!scroll)
+            R.id.action_share -> startActivity(
+                Intent.createChooser(
+                    shareIntent,
+                    getString(R.string.menu_share)
+                )
+            )
+            R.id.action_filter -> showFilterDialog()
+            R.id.action_delete_all -> adapter.clear()
+            R.id.action_search -> showSearchDialog()
+            else -> return false
         }
-        return true;
+        return true
     }
 
-    private void showFilterDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        final FilterOptionsViewController filterOptionsViewController = new FilterOptionsViewController(this);
-        filterOptionsViewController.setTag(adapter.getTag());
-        filterOptionsViewController.setKeyword(adapter.getKeyword());
-        builder.setView(filterOptionsViewController.getBaseView());
-
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String tag = filterOptionsViewController.getTag();
-                String keyword = filterOptionsViewController.getKeyword();
-                adapter.filter(tag, keyword);
-                filterOptionsViewController.saveTagKeyword(tag, keyword);
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-
-        Dialog dialog = builder.create();
-        dialog.getWindow().setGravity(Gravity.TOP);
-        dialog.show();
+    private fun showFilterDialog() {
+        val builder = AlertDialog.Builder(this)
+        val filterOptionsViewController = FilterOptionsController(this)
+        filterOptionsViewController.tag = adapter.tag
+        filterOptionsViewController.keyword = adapter.keyword
+        builder.setView(filterOptionsViewController.baseView)
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+            val tag = filterOptionsViewController.tag
+            val keyword = filterOptionsViewController.keyword
+            adapter.filter(tag, keyword)
+            filterOptionsViewController.saveTagKeyword(tag, keyword)
+        }
+        builder.setNegativeButton(android.R.string.cancel, null)
+        val dialog: Dialog = builder.create()
+        dialog.window!!.setGravity(Gravity.TOP)
+        dialog.show()
     }
 
-    private void showSearchDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        final SearchOptionsViewController searchOptionsViewController = new SearchOptionsViewController(this);
-        searchOptionsViewController.setSearchWord(adapter.getSearchWord());
-        builder.setView(searchOptionsViewController.getBaseView());
-
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String searchWord = searchOptionsViewController.getSearchWord();
-                adapter.search(searchWord);
-                searchOptionsViewController.saveSearchWord(searchWord);
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-
-        Dialog dialog = builder.create();
-        dialog.getWindow().setGravity(Gravity.TOP);
-        dialog.show();
+    private fun showSearchDialog() {
+        val builder = AlertDialog.Builder(this)
+        val searchOptionsViewController = SearchOptionsController(this)
+        searchOptionsViewController.searchWord = adapter.searchWord
+        builder.setView(searchOptionsViewController.baseView)
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+            val searchWord = searchOptionsViewController.searchWord
+            adapter.search(searchWord)
+            searchOptionsViewController.saveSearchWord(searchWord)
+        }
+        builder.setNegativeButton(android.R.string.cancel, null)
+        val dialog: Dialog = builder.create()
+        dialog.window!!.setGravity(Gravity.TOP)
+        dialog.show()
     }
 
-    private KeyPair getKeyPair() throws GeneralSecurityException, IOException {
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        KeyPair keyPair;
-
+    @Throws(GeneralSecurityException::class, IOException::class)
+    private fun getKeyPair(): KeyPair {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val keyPair: KeyPair
         if (preferences.contains(KEY_PUBLIC) && preferences.contains(KEY_PRIVATE)) {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(
-                    Base64.decode(preferences.getString(KEY_PUBLIC, null), Base64.DEFAULT)));
-            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(
-                    Base64.decode(preferences.getString(KEY_PRIVATE, null), Base64.DEFAULT)));
-
-            keyPair = new KeyPair(publicKey, privateKey);
+            val keyFactory = KeyFactory.getInstance("RSA")
+            val publicKey = keyFactory.generatePublic(
+                X509EncodedKeySpec(
+                    Base64.decode(preferences.getString(KEY_PUBLIC, null), Base64.DEFAULT)
+                )
+            )
+            val privateKey = keyFactory.generatePrivate(
+                PKCS8EncodedKeySpec(
+                    Base64.decode(preferences.getString(KEY_PRIVATE, null), Base64.DEFAULT)
+                )
+            )
+            keyPair = KeyPair(publicKey, privateKey)
         } else {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(2048);
-            keyPair = generator.generateKeyPair();
-
+            val generator = KeyPairGenerator.getInstance("RSA")
+            generator.initialize(2048)
+            keyPair = generator.generateKeyPair()
             preferences
-                    .edit()
-                    .putString(KEY_PUBLIC, Base64.encodeToString(keyPair.getPublic().getEncoded(), Base64.DEFAULT))
-                    .putString(KEY_PRIVATE, Base64.encodeToString(keyPair.getPrivate().getEncoded(), Base64.DEFAULT))
-                    .apply();
+                .edit()
+                .putString(
+                    KEY_PUBLIC,
+                    Base64.encodeToString(keyPair.public.encoded, Base64.DEFAULT)
+                )
+                .putString(
+                    KEY_PRIVATE,
+                    Base64.encodeToString(keyPair.private.encoded, Base64.DEFAULT)
+                )
+                .apply()
         }
-
-        return keyPair;
+        return keyPair
     }
 
-    private class ReaderTask extends AsyncTask<Void, StatusUpdate, Void> {
+    @SuppressLint("StaticFieldLeak")
+    private inner class ReaderTask : AsyncTask<Void?, StatusUpdate, Void?>() {
 
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            Reader reader = new RemoteReader(keyPair);
+        override fun doInBackground(vararg params: Void?): Void? {
+            val reader: Reader = RemoteReader(keyPair)
             //Reader reader = new LocalReader();
+            reader.read(object : Reader.UpdateHandler {
+                override val isCancelled: Boolean
+                    get() = this@ReaderTask.isCancelled
 
-            reader.read(new Reader.UpdateHandler() {
-                @Override
-                public boolean isCancelled() {
-                    return ReaderTask.this.isCancelled();
+                override fun update(status: Int, lines: List<String>?) {
+                    publishProgress(StatusUpdate(status, lines))
                 }
-
-                @Override
-                public void update(int status, List<String> lines) {
-                    publishProgress(new StatusUpdate(status, lines));
-                }
-            });
-
-            return null;
+            })
+            return null
         }
 
-        @Override
-        protected void onProgressUpdate(StatusUpdate... items) {
-            for (StatusUpdate statusUpdate : items) {
-                if (statusUpdate.getStatusMessage() != 0) {
-                    statusItem.setTitle(statusUpdate.getStatusMessage());
-                    reconnectItem.setVisible(statusUpdate.getStatusMessage() != R.string.status_active);
-                    scrollItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    filterItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    searchItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
-                    moreMenuItem.setVisible(statusUpdate.getStatusMessage() == R.string.status_active);
+        override fun onProgressUpdate(vararg values: StatusUpdate) {
+            for (statusUpdate in values) {
+                if (statusUpdate.statusMessage != 0) {
+                    statusItem?.setTitle(statusUpdate.statusMessage)
+                    reconnectItem?.isVisible = statusUpdate.statusMessage != R.string.status_active
+                    scrollItem?.isVisible = statusUpdate.statusMessage == R.string.status_active
+                    filterItem?.isVisible = statusUpdate.statusMessage == R.string.status_active
+                    searchItem?.isVisible = statusUpdate.statusMessage == R.string.status_active
+                    moreMenuItem?.isVisible = statusUpdate.statusMessage == R.string.status_active
                 }
-                if (statusUpdate.getLines() != null) {
-                    adapter.addItems(statusUpdate.getLines());
+                statusUpdate.lines?.let {
+                    adapter.addItems(it)
                     if (scroll) {
-                        recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+                        recyclerView.scrollToPosition(adapter.itemCount - 1)
                     }
                 }
             }
         }
 
+    }
+
+    companion object {
+        private val TAG = MainActivity::class.java.simpleName
+        private const val KEY_PUBLIC = "publicKey"
+        private const val KEY_PRIVATE = "privateKey"
+        private const val KEY_WARNING_SHOWN = "warningShown"
+        private const val TEMP_FILE = "/logcat.txt"
+        private const val ANIMATION_DURATION: Long = 75
     }
 
 }

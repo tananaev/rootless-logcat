@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 - 2019 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,80 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import android.util.Base64;
-import android.util.Log;
+import android.util.Base64
+import android.util.Log
+import com.tananaev.adblib.AdbConnection
+import com.tananaev.adblib.AdbCrypto
+import java.io.IOException
+import java.net.Socket
+import java.security.KeyPair
 
-import com.tananaev.adblib.AdbBase64;
-import com.tananaev.adblib.AdbConnection;
-import com.tananaev.adblib.AdbCrypto;
-import com.tananaev.adblib.AdbStream;
+class RemoteReader(private val keyPair: KeyPair) : Reader {
 
-import java.io.IOException;
-import java.net.Socket;
-import java.security.KeyPair;
-import java.util.ArrayList;
-import java.util.List;
-
-public class RemoteReader implements Reader {
-
-    private static final String TAG = RemoteReader.class.getSimpleName();
-
-    private KeyPair keyPair;
-
-    public RemoteReader(KeyPair keyPair) {
-        this.keyPair = keyPair;
-    }
-
-    @Override
-    public void read(UpdateHandler updateHandler) {
-
-        AdbConnection connection = null;
-
+    override fun read(updateHandler: Reader.UpdateHandler) {
+        var connection: AdbConnection? = null
         try {
-
-            updateHandler.update(R.string.status_connecting, null);
-
-            Socket socket = new Socket("localhost", 5555);
-
-            AdbCrypto crypto = AdbCrypto.loadAdbKeyPair(new AdbBase64() {
-                @Override
-                public String encodeToString(byte[] data) {
-                    return Base64.encodeToString(data, Base64.NO_WRAP);
-                }
-            }, keyPair);
-
-            connection = AdbConnection.create(socket, crypto);
-
-            connection.connect();
-
-            updateHandler.update(R.string.status_opening, null);
-
-            AdbStream stream = connection.open("shell:logcat -v time");
-
-            updateHandler.update(R.string.status_active, null);
-
-            while (!updateHandler.isCancelled()) {
-                List<String> lines = new ArrayList<>();
-                for (String line : new String(stream.read()).split("\\r?\\n")) {
-                    if (!line.isEmpty()) {
-                        lines.add(line);
+            updateHandler.update(R.string.status_connecting, null)
+            val socket = Socket("localhost", 5555)
+            val crypto = AdbCrypto.loadAdbKeyPair(
+                { data -> Base64.encodeToString(data, Base64.NO_WRAP) },
+                keyPair,
+            )
+            connection = AdbConnection.create(socket, crypto)
+            connection.connect()
+            updateHandler.update(R.string.status_opening, null)
+            val stream = connection.open("shell:logcat -v time")
+            updateHandler.update(R.string.status_active, null)
+            while (!updateHandler.isCancelled) {
+                val lines: MutableList<String> = ArrayList()
+                for (line in String(stream.read()).split("\\r?\\n").toTypedArray()) {
+                    if (line.isNotEmpty()) {
+                        lines.add(line)
                     }
                 }
-                updateHandler.update(0, lines);
+                updateHandler.update(0, lines)
             }
-
-        } catch (InterruptedException e) {
+        } catch (e: InterruptedException) {
             try {
-                connection.close();
-            } catch (IOException ee) {
-                Log.w(TAG, ee);
+                connection?.close()
+            } catch (ee: IOException) {
+                Log.w(TAG, ee)
             }
-        } catch (IOException e) {
-            Log.w(TAG, e);
+        } catch (e: IOException) {
+            Log.w(TAG, e)
         }
+    }
 
+    companion object {
+        private val TAG = RemoteReader::class.java.simpleName
     }
 
 }

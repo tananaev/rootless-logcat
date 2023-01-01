@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Anton Tananaev (anton.tananaev@gmail.com)
+ * Copyright 2016 - 2022 Anton Tananaev (anton.tananaev@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tananaev.logcat;
+package com.tananaev.logcat
 
-import java.util.List;
-
-public interface Reader {
+interface Reader {
 
     interface UpdateHandler {
-        boolean isCancelled();
-        void update(int status, List<String> lines);
+        val isCancelled: Boolean
+        fun update(status: Int, lines: List<String>?)
     }
 
-    void read(UpdateHandler updateHandler);
+    fun read(updateHandler: UpdateHandler)
 
 }

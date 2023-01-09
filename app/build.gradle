@@ -8,12 +8,20 @@ android {
 
     defaultConfig {
         applicationId "com.tananaev.logcat"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 33
-        versionCode 13
-        versionName "1.12"
+        versionCode 14
+        versionName "2.0"
     }
     namespace "com.tananaev.logcat"
+
+    flavorDimensions 'default'
+    productFlavors {
+        regular {
+            isDefault = true
+        }
+        google
+    }
     lint {
         checkReleaseBuilds false
     }
@@ -24,4 +32,25 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'com.tananaev:adblib:1.2'
+    googleImplementation platform('com.google.firebase:firebase-bom:31.0.1')
+    googleImplementation 'com.google.firebase:firebase-analytics-ktx'
+    googleImplementation 'com.google.firebase:firebase-crashlytics'
+    googleImplementation 'com.google.android.gms:play-services-ads:21.4.0'
+    googleImplementation 'com.google.android.play:review-ktx:2.0.1'
+}
+
+if (getGradle().getStartParameter().getTaskRequests().toString().contains('Google')) {
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'com.google.firebase.crashlytics'
+
+    task copyJson(type: Copy) {
+        from '../../environment/firebase'
+        into '.'
+        include 'rootless-logcat.json'
+        rename('rootless-logcat.json', 'google-services.json')
+    }
+
+    afterEvaluate {
+        preBuild.dependsOn copyJson
+    }
 }

@@ -12,6 +12,7 @@ android {
         targetSdkVersion 33
         versionCode 14
         versionName "2.0"
+        multiDexEnabled true
     }
     namespace "com.tananaev.logcat"
 
@@ -29,6 +30,7 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.android.support:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'com.tananaev:adblib:1.2'

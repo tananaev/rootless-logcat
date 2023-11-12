@@ -1,28 +1,42 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
-    compileSdkVersion 33
-
+    compileSdk 34
     defaultConfig {
         applicationId "com.tananaev.logcat"
         minSdkVersion 19
-        targetSdkVersion 33
-        versionCode 14
-        versionName "2.0"
+        targetSdkVersion 34
+        versionCode 15
+        versionName "2.1"
         multiDexEnabled true
     }
     namespace "com.tananaev.logcat"
 
-    flavorDimensions 'default'
+    buildFeatures {
+        flavorDimensions = ['default']
+    }
     productFlavors {
         regular {
             isDefault = true
+            ext.enableCrashlytics = false
         }
         google
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+    }
+
     lint {
         checkReleaseBuilds false
     }
@@ -31,28 +45,28 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'com.android.support:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.7.0'
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'com.tananaev:adblib:1.2'
     googleImplementation platform('com.google.firebase:firebase-bom:31.0.1')
     googleImplementation 'com.google.firebase:firebase-analytics-ktx'
     googleImplementation 'com.google.firebase:firebase-crashlytics'
-    googleImplementation 'com.google.android.gms:play-services-ads:21.4.0'
+    googleImplementation 'com.google.android.gms:play-services-ads:22.5.0'
     googleImplementation 'com.google.android.play:review-ktx:2.0.1'
 }
 
-if (getGradle().getStartParameter().getTaskRequests().toString().contains('Google')) {
-    apply plugin: 'com.google.gms.google-services'
-    apply plugin: 'com.google.firebase.crashlytics'
-
-    task copyJson(type: Copy) {
-        from '../../environment/firebase'
-        into '.'
-        include 'rootless-logcat.json'
-        rename('rootless-logcat.json', 'google-services.json')
-    }
-
-    afterEvaluate {
-        preBuild.dependsOn copyJson
+tasks.register('copyFirebaseConfig', Copy) {
+    from '../../environment/firebase'
+    into '.'
+    include 'rootless-logcat.json'
+    rename('rootless-logcat.json', 'google-services.json')
+}
+afterEvaluate {
+    tasks.matching { it.name.contains('Google') }.configureEach { task ->
+        if (task.name.contains('Regular')) {
+            task.enabled false
+        } else {
+            task.dependsOn copyFirebaseConfig
+        }
     }
 }

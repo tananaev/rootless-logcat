@@ -2,6 +2,7 @@ package com.tananaev.logcat
 
 import android.os.Bundle
 import android.preference.PreferenceManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -18,7 +19,14 @@ class GoogleActivity : MainActivity() {
         MobileAds.initialize(this) {}
         setContentView(R.layout.activity_google)
         super.onCreate(savedInstanceState)
-        findViewById<AdView>(R.id.ad_view).loadAd(AdRequest.Builder().build())
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                if (adapter.itemCount > 0) {
+                    findViewById<AdView>(R.id.ad_view).loadAd(AdRequest.Builder().build())
+                    adapter.unregisterAdapterDataObserver(this)
+                }
+            }
+        })
     }
 
     override fun onResume() {

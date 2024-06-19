@@ -52,7 +52,7 @@ import java.security.spec.X509EncodedKeySpec
 abstract class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: LineAdapter
+    protected lateinit var adapter: LineAdapter
     private lateinit var keyPair: KeyPair
     private var readerTask: ReaderTask? = null
     private var statusItem: MenuItem? = null

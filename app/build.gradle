@@ -11,8 +11,8 @@ android {
         applicationId "com.tananaev.logcat"
         minSdkVersion 23
         targetSdkVersion 36
-        versionCode 16
-        versionName "2.2"
+        versionCode 17
+        versionName "2.3"
         multiDexEnabled true
     }
     namespace "com.tananaev.logcat"

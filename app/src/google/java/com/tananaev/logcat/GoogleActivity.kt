@@ -2,6 +2,10 @@ package com.tananaev.logcat
 
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.widget.LinearLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
@@ -19,10 +23,18 @@ class GoogleActivity : MainActivity() {
         MobileAds.initialize(this) {}
         setContentView(R.layout.activity_google)
         super.onCreate(savedInstanceState)
+        val adView = findViewById<AdView>(R.id.ad_view)
+        ViewCompat.setOnApplyWindowInsetsListener(adView) { v, insets ->
+            val bottomInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            v.updateLayoutParams<LinearLayout.LayoutParams> {
+                bottomMargin = bottomInset
+            }
+            insets
+        }
         adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 if (adapter.itemCount > 0) {
-                    findViewById<AdView>(R.id.ad_view).loadAd(AdRequest.Builder().build())
+                    adView.loadAd(AdRequest.Builder().build())
                     adapter.unregisterAdapterDataObserver(this)
                 }
             }

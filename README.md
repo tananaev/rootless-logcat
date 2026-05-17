@@ -2,7 +2,7 @@
 
 [![Get it on Google Play](http://www.tananaev.com/badges/google-play.svg)](https://play.google.com/store/apps/details?id=com.tananaev.logcat) [![Get it on F-Droid](http://www.tananaev.com/badges/f-droid.svg)](https://f-droid.org/repository/browse/?fdid=com.tananaev.logcat)
 
-Read Android logs without root access. The app uses remote debugging to connect to phone local ADB daemon. Configuring remote debugging on a phone can be challenging and requires some technical expertise. It has to be done once and after each device reboot.
+Android Logcat without Root is an app for reading device logs on phones that have not been rooted. It connects to the local ADB daemon over the network, allowing developers and power users to inspect system logs directly from the device. Configuring remote debugging requires some technical setup and must be repeated after each device reboot.
 
 Enable USB debugging first on your device. Navigate to Settings > About Phone and tap Build number seven times. Go back, access the Developer options menu and check USB debugging option.
 

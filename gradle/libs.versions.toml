@@ -11,5 +11,5 @@ play-review-ktx = "com.google.android.play:review-ktx:2.0.2"
 [plugins]
 android-application = { id = "com.android.application", version = "8.11.0" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version = "2.2.0" }
-google-services = { id = "com.google.gms.google-services", version = "4.4.3" }
+google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.4" }
